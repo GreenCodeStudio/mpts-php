@@ -66,4 +66,60 @@ class XMLParser
         }
         return $this->openElements[0];
     }
+
+    protected function parseElement()
+    {
+        $autoclose = false;
+        $element = new TElement();
+        $element->parsePosition = $this->position;
+        while ($this->position < strlen($this->text)) {
+            $char = $this->text[$this->position];
+            if ($char == '>' || $char == ' ' || $char == '/')
+                break;
+            $element->tagName .= $char;
+            $this->position++;
+        }
+        while ($this->position < strlen($this->text)) {
+            $char = $this->text[$this->position];
+            if ($char == '>') {
+                $this->position++;
+                break;
+            } else if ($char == '/') {
+                $this->position++;
+                $autoclose = true;
+            } else if (preg_match("/\s/", $char)) {
+                $this->position++;
+            } else {
+                $name = $this->readUntill("/[\s=]/");
+                $value = null;
+                $this->skipWhitespace();
+
+                //todo
+            }
+        }
+
+        return (object)['element' => $element, 'autoclose' => $autoclose];
+    }
+
+    protected function parseElementEnd()
+    {
+        $name = "";
+
+        while ($this->position < strlen($this->text)) {
+            $char = $this->text[$this->position];
+            if ($char == '>' || $char == ' ' || $char == '/')
+                break;
+            $name .= $char;
+            $this->position++;
+        }
+        while ($this->position < strlen($this->text)) {
+            $char = $this->text[$this->position];
+            if ($char == '>') {
+                $this->position++;
+                break;
+            }
+            $this->position++;
+        }
+        return $name;
+    }
 }
