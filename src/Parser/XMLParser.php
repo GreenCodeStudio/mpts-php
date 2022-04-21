@@ -6,6 +6,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\TAttribute;
 use MKrawczyk\Mpts\Nodes\TDocumentFragment;
 use MKrawczyk\Mpts\Nodes\TElement;
+use MKrawczyk\Mpts\Nodes\TExpressionText;
 use MKrawczyk\Mpts\Nodes\TText;
 
 class XMLParser extends AbstractParser
@@ -54,6 +55,7 @@ class XMLParser extends AbstractParser
                 }
             } else if ($char == "{" && $this->text[$this->position + 1] == "{") {
                 $this->position += 2;
+                $result = $this->parseExpression('}}');
                 $node = new TExpressionText();
                 $node->expression = $result;
                 $element->children[] = $node;

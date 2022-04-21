@@ -61,6 +61,16 @@ class ExecutionTest extends TestCase
         $this->assertEquals("<div><p><strong></strong><span></span></p></div>", $this->fragmentToHtml($result));
     }
 
+    public function testBasicHtml()
+    {
+        $obj = XMLParser::Parse("<div>&#65;&#x0042;{{c}}</div>");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['c']="C";
+        $result = $obj->execute($env);
+        $this->assertEquals("<div>ABC</div>", $this->fragmentToHtml($result));
+    }
+
 
     public function testElementWithAttributes()
     {
