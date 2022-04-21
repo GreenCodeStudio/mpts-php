@@ -1,0 +1,1 @@
+{"version":1,"defects":{"XMLParserTest::testBasicText":4,"XMLParserTest::testBasicElement":4,"XMLParserTest::testBasicElement2":4,"XMLParserTest::testElementsInside":4},"times":{"XMLParserTest::testBasicText":0.004,"XMLParserTest::testBasicElement":0.001,"XMLParserTest::testBasicElement2":0,"XMLParserTest::testElementsInside":0}}

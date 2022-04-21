@@ -1,0 +1,20 @@
+{
+    "name": "mkrawczyk/mpts",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "MKrawczyk\\Mpts\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mateusz Krawczyk",
+            "email": "mateuszkrawczyk1996@gmail.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^9.5.20"
+    }
+}
