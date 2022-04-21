@@ -13,7 +13,9 @@
             "email": "mateuszkrawczyk1996@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+      "ext-dom": "*"
+    },
     "require-dev": {
         "phpunit/phpunit": "^9.5.20"
     }
