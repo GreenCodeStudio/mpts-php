@@ -1,5 +1,7 @@
 <?php
 
+use MKrawczyk\Mpts\Nodes\Expressions\TEString;
+use MKrawczyk\Mpts\Nodes\TAttribute;
 use MKrawczyk\Mpts\Parser\XMLParser;
 use MKrawczyk\Mpts\Nodes\TDocumentFragment;
 use MKrawczyk\Mpts\Nodes\TText;
@@ -46,21 +48,24 @@ class XMLParserTest extends TestCase
     }
 
 
-//public function testElementWithAttribute(){
-//    const obj = XMLParser.Parse("<img src=\"a.png\" alt='a'/>");
-//    expect(obj).to.be.instanceOf(TDocumentFragment);
-//        expect(obj.children[0]).to.be.instanceOf(TElement);
-//        expect(obj.children[0].tagName).to.be.equals("img");
-//        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
-//        expect(obj.children[0].attributes[0].name).to.be.equals("src");
-//        expect(obj.children[0].attributes[0].expression).to.be.instanceOf(TEString);
-//        expect(obj.children[0].attributes[0].expression.value).to.be.equal("a.png");
-//        expect(obj.children[0].attributes[1]).to.be.instanceOf(TAttribute);
-//        expect(obj.children[0].attributes[1].name).to.be.equals("alt");
-//        expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEString);
-//        expect(obj.children[0].attributes[1].expression.value).to.be.equal("a");
-//    });
-//}
+    public function testElementWithAttribute()
+    {
+
+        $obj = XMLParser::Parse("<img src=\"a.png\" alt='a'/>");
+
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $this->assertEquals("img", $obj->children[0]->tagName);
+        $this->assertInstanceOf(TAttribute::class, $obj->children[0]->attributes[0]);
+        $this->assertEquals("src", $obj->children[0]->attributes[0]->name);
+        $this->assertInstanceOf(TEString::class, $obj->children[0]->attributes[0]->expression);
+        $this->assertEquals("a.png", $obj->children[0]->attributes[0]->expression->value);
+        $this->assertInstanceOf(TAttribute::class, $obj->children[0]->attributes[1]);
+        $this->assertEquals("alt", $obj->children[0]->attributes[1]->name);
+        $this->assertInstanceOf(TEString::class, $obj->children[0]->attributes[1]->expression);
+        $this->assertEquals("a", $obj->children[0]->attributes[1]->expression->value);
+    }
+
 //
 //public function testElementWithAttributeWithVariables(){
 //    const obj = XMLParser.Parse("<img src=(v1) alt=v2/>");

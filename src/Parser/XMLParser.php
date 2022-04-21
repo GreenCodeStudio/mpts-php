@@ -2,11 +2,13 @@
 
 namespace MKrawczyk\Mpts\Parser;
 
+use MKrawczyk\Mpts\Nodes\Expressions\TEString;
+use MKrawczyk\Mpts\Nodes\TAttribute;
 use MKrawczyk\Mpts\Nodes\TDocumentFragment;
 use MKrawczyk\Mpts\Nodes\TElement;
 use MKrawczyk\Mpts\Nodes\TText;
 
-class XMLParser
+class XMLParser extends AbstractParser
 {
     public function __construct(string $text)
     {
@@ -93,13 +95,34 @@ class XMLParser
                 $name = $this->readUntill("/[\s=]/");
                 $value = null;
                 $this->skipWhitespace();
-
-                //todo
+                $char = $this->text[$this->position];
+                if ($char == '=') {
+                    $this->position++;
+                    $this->skipWhitespace();
+                    $char2 = $this->text[$this->position];
+                    if ($char2 == '"') {
+                        $this->position++;
+                        $value = new TEString($this->readUntill('/"/'));
+                        $this->position++;
+                    } else if ($char2 == "'") {
+                        $this->position++;
+                        $value = new TEString($this->readUntill("/'/"));
+                        $this->position++;
+                    } else if ($char2 == '(') {
+                        $this->position++;
+                        $value = ExpressionParser::Parse($this->readUntill('/\)/'));
+                        $this->position++;
+                    } else {
+                        $value = ExpressionParser::Parse($this->readUntill('/[\s>\/]/'));
+                    }
+                }
+                $element->attributes[] = new TAttribute($name, $value);
             }
         }
 
         return (object)['element' => $element, 'autoclose' => $autoclose];
     }
+
 
     protected function parseElementEnd()
     {
@@ -122,4 +145,20 @@ class XMLParser
         }
         return $name;
     }
+
+    protected function parseExpression($end)
+    {
+        $text = "";
+
+        while ($this->position < strlen($this->text)) {
+            if (substr($this->text, $this->position, strlen($end)) == $end) {
+                $this->position += strlen($end);
+                break;
+            }
+            $text .= $this->text[$this->position];
+            $this->position++;
+        }
+        return ExpressionParser::Parse($text);
+    }
+
 }
