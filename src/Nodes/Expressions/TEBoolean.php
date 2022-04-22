@@ -4,7 +4,7 @@ namespace MKrawczyk\Mpts\Nodes\Expressions;
 
 use MKrawczyk\Mpts\Environment;
 
-class TEBoolean
+class TEBoolean extends TEExpression
 {
     public bool $value;
 
@@ -13,7 +13,7 @@ class TEBoolean
         $this->value = $value;
     }
 
-    public function execute(Environment $env)
+    public function execute(Environment $env):bool
     {
         return $this->value;
     }

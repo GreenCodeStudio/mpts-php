@@ -4,16 +4,16 @@ namespace MKrawczyk\Mpts\Nodes\Expressions;
 
 use MKrawczyk\Mpts\Environment;
 
-class TEString
+class TEString extends TEExpression
 {
-    private string $value;
+    public string $value;
 
     public function __construct(string $value)
     {
         $this->value = $value;
     }
 
-    public function execute(Environment $env)
+    public function execute(Environment $env): string
     {
         return $this->value;
     }

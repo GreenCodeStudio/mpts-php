@@ -5,7 +5,7 @@ namespace MKrawczyk\Mpts\Nodes\Expressions;
 
 use MKrawczyk\Mpts\Environment;
 
-class TENumber
+class TENumber extends TEExpression
 {
     private int|float $value;
 
@@ -14,7 +14,7 @@ class TENumber
         $this->value = $number;
     }
 
-    public function execute(Environment $env)
+    public function execute(Environment $env): int|float
     {
         return $this->value;
     }

@@ -4,11 +4,11 @@ namespace MKrawczyk\Mpts\Nodes;
 
 use MKrawczyk\Mpts\Environment;
 
-class TDocumentFragment
+class TDocumentFragment extends TNode
 {
     public array $children = [];
 
-    public function execute(Environment $env)
+    public function execute(Environment $env): \DOMDocumentFragment
     {
         $ret = $env->document->createDocumentFragment();
         foreach ($this->children as $child) {

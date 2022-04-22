@@ -5,6 +5,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
 use MKrawczyk\Mpts\Nodes\TAttribute;
+use MKrawczyk\Mpts\Nodes\TComment;
 use MKrawczyk\Mpts\Parser\XMLParser;
 use MKrawczyk\Mpts\Nodes\TDocumentFragment;
 use MKrawczyk\Mpts\Nodes\TText;

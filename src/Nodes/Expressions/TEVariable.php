@@ -4,7 +4,7 @@ namespace MKrawczyk\Mpts\Nodes\Expressions;
 
 use MKrawczyk\Mpts\Environment;
 
-class TEVariable
+class TEVariable extends TEExpression
 {
     public string $name;
 
