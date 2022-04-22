@@ -6,7 +6,7 @@ use MKrawczyk\Mpts\Environment;
 
 class TEVariable
 {
-    private string $name;
+    public string $name;
 
     public function __construct(string $name = "")
     {

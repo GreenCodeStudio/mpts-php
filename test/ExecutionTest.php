@@ -66,7 +66,7 @@ class ExecutionTest extends TestCase
         $obj = XMLParser::Parse("<div>&#65;&#x0042;{{c}}</div>");
         $env = new Environment();
         $env->document = new DOMDocument();
-        $env->variables['c']="C";
+        $env->variables['c'] = "C";
         $result = $obj->execute($env);
         $this->assertEquals("<div>ABC</div>", $this->fragmentToHtml($result));
     }
@@ -100,5 +100,42 @@ class ExecutionTest extends TestCase
         $env->variables['v'] = 3;
         $result1 = $obj->execute($env);
         $this->assertEquals('c', $this->fragmentToHtml($result1));
+    }
+
+    public function testLoop()
+    {
+        $obj = XMLParser::Parse("<:loop count=10>b</:loop>");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $result = $obj->execute($env);
+        $this->assertEquals('bbbbbbbbbb', $this->fragmentToHtml($result));
+    }
+
+    public function testLoopByVariable()
+    {
+        $obj = XMLParser::Parse("<:loop count=a>b</:loop>");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['a'] = 3;
+        $result = $obj->execute($env);
+        $this->assertEquals('bbb', $this->fragmentToHtml($result));
+    }
+    public function testForeachBasic()
+    {
+        $obj = XMLParser::Parse("<:foreach collection=a>b</:foreach>");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['a'] = [1,2,3,4,5];
+        $result = $obj->execute($env);
+        $this->assertEquals('bbbbb', $this->fragmentToHtml($result));
+    }
+    public function testForeachAdvanced()
+    {
+        $obj = XMLParser::Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</div></:foreach>");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['a'] = ['a','b','c','d','e'];
+        $result = $obj->execute($env);
+        $this->assertEquals('<div>0:a</div><div>1:b</div><div>2:c</div><div>3:d</div><div>4:e</div>', $this->fragmentToHtml($result));
     }
 }
