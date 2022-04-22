@@ -38,6 +38,18 @@ class ExpressionParseTest extends TestCase
         $this->assertEquals(false, $obj->value);
     }
 
+    public function testProperty()
+    {
+        $obj = ExpressionParser::Parse("var1.sub.sub2");
+
+        $this->assertInstanceOf(TEProperty::class, $obj);
+        $this->assertEquals("sub2", $obj->name);
+        $this->assertInstanceOf(TEProperty::class, $obj->source);
+        $this->assertEquals("sub", $obj->source->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->source->source);
+        $this->assertEquals("var1", $obj->source->source->name);
+    }
+
     public function testNumber()
     {
         $obj = ExpressionParser::Parse("123");
@@ -91,7 +103,7 @@ class ExpressionParseTest extends TestCase
 
     public function testEqualDouble()
     {
-        $obj = ExpressionParser::Parse('a==b');
+        $obj = ExpressionParser::Parse('(a==b)==(c==d)');
 
         $this->assertInstanceOf(TEEqual::class, $obj);
         $this->assertInstanceOf(TEEqual::class, $obj->left);
