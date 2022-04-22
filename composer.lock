@@ -4,8 +4,51 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b7bd598399a4cc61a4ddd1bd3d5788a3",
-    "packages": [],
+    "content-hash": "12cfbd925d7dda899c7393644cb5db2a",
+    "packages": [
+        {
+            "name": "mkrawczyk/funquery",
+            "version": "v1.9.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/matrix0123456789/fun-query.git",
+                "reference": "bb5c5f4a4469e9192e27812d19128f9cb594e9ce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/matrix0123456789/fun-query/zipball/bb5c5f4a4469e9192e27812d19128f9cb594e9ce",
+                "reference": "bb5c5f4a4469e9192e27812d19128f9cb594e9ce",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=7.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.5.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MKrawczyk\\FunQuery\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mateusz Krawczyk"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/matrix0123456789/fun-query/issues",
+                "source": "https://github.com/matrix0123456789/fun-query/tree/v1.9.2"
+            },
+            "time": "2022-04-15T10:33:53+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "doctrine/instantiator",
@@ -2111,7 +2154,9 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "ext-dom": "*"
+    },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"
 }

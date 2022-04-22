@@ -4,9 +4,11 @@ namespace MKrawczyk\Mpts\Parser;
 
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\TAttribute;
+use MKrawczyk\Mpts\Nodes\TComment;
 use MKrawczyk\Mpts\Nodes\TDocumentFragment;
 use MKrawczyk\Mpts\Nodes\TElement;
 use MKrawczyk\Mpts\Nodes\TExpressionText;
+use MKrawczyk\Mpts\Nodes\TIf;
 use MKrawczyk\Mpts\Nodes\TText;
 
 class XMLParser extends AbstractParser
@@ -30,7 +32,12 @@ class XMLParser extends AbstractParser
             $element = end($this->openElements);
             $last = end($element->children);
             if ($char == '<') {
-                if ($this->text[$this->position + 1] == '/') {
+                if (substr($this->text, $this->position, 4) == '<!--') {
+                    $this->position += 4;
+                    $text = $this->readUntillText('-->');
+                    $this->position += 3;
+                    $element->children[] = new TComment($text);
+                } else if ($this->text[$this->position + 1] == '/') {
                     $this->position += 2;
                     $name = $this->parseElementEnd();
 
@@ -163,4 +170,88 @@ class XMLParser extends AbstractParser
         return ExpressionParser::Parse($text);
     }
 
+    protected function convertToSpecialElement($result, $element)
+    {
+        if (strtolower($result->element->tagName) == ":if") {
+            $node = new TIf();
+            $expression = $result->element->getAttribute('condition')->expression;
+            $node->conditions[] = (object)['expression' => $expression, 'children' => []];
+            $element->children[] = $node;
+
+            if (!$result->autoclose)
+                $this->openElements[] = $node;
+        } else if (strtolower($result->element->tegName) == ":else-if") {
+            $last = end($element->children);
+            if (!($last instanceof TIf && $last->else == null))
+                throw new MptsParserError("need if before else-if");
+
+            $expression = $result->element->getAttribute('condition')->expression;
+            $last->conditions[] = (object)['expression' => $expression, 'children' => []];
+
+            if (!$result->autoclose)
+                $this->openElements[] = $last;
+        } else if (strtolower($result->element->tegName) == ":else") {
+            $last = end($element->children);
+            if (!($last instanceof TIf && $last->else == null))
+                throw new MptsParserError("need if before else");
+
+            $last->else = (object)['children' => []];
+
+            if (!$result->autoclose)
+                $this->openElements[] = $last;
+        } else if (strtolower($result->element->tegName) == ":loop") {
+            $count = $result->element->getAttribute('count')->expression;
+            $node = new TLoop($count);
+            $element->children[] = $node;
+            if (!$result->autoclose)
+                $this->openElements[] = $node;
+        } else if (strtolower($result->element->tegName) == ":foreach") {
+            $collection = $result->element->getAttribute('collection')->expression;
+            $item = $result->element->getAttribute('item')?->expression->name;
+            $key = $result->element->getAttribute('key')?->expression->name;
+            $node = new TForeach($collection, $item, $key);
+
+            $element->children[] = $node;
+
+            if (!$result->autoclose)
+                $this->openElements[] = $node;
+        }
+    }
+
+    protected function closeSpecialElement(string $tagName)
+    {
+        $tagName = strtolower($tagName);
+        $last = end($this->openElements);
+        if ($tagName == ':if') {
+            if ($last instanceof TIf && count($last->conditions) == 1 && $last->else == null) {
+                array_pop($this->openElements);
+            } else {
+                throw new MptsParserError("Last opened element is not <:if>");
+            }
+        } elseif ($tagName == ':else-if') {
+            if ($last instanceof TIf && count($last->conditions) > 1 && $last->else == null) {
+                array_pop($this->openElements);
+            } else {
+                throw new MptsParserError("Last opened element is not <:else-if>");
+            }
+        } elseif ($tagName == ':else') {
+            if ($last instanceof TIf && $last->else != null) {
+                array_pop($this->openElements);
+            } else {
+                throw new MptsParserError("Last opened element is not <:else>");
+            }
+        } elseif ($tagName == ':loop') {
+            if ($last instanceof TLoop) {
+                array_pop($this->openElements);
+            } else {
+                throw new MptsParserError("Last opened element is not <:loop>");
+            }
+        } elseif ($tagName == ':if') {
+            if ($last instanceof TForeacj) {
+                array_pop($this->openElements);
+            } else {
+                throw new MptsParserError("Last opened element is not <:foreach>");
+            }
+        }
+    }
 }
