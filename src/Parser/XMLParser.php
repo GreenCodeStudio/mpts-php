@@ -8,6 +8,7 @@ use MKrawczyk\Mpts\Nodes\TComment;
 use MKrawczyk\Mpts\Nodes\TDocumentFragment;
 use MKrawczyk\Mpts\Nodes\TElement;
 use MKrawczyk\Mpts\Nodes\TExpressionText;
+use MKrawczyk\Mpts\Nodes\TForeach;
 use MKrawczyk\Mpts\Nodes\TIf;
 use MKrawczyk\Mpts\Nodes\TText;
 

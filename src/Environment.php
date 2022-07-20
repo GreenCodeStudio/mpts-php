@@ -13,4 +13,9 @@ class Environment
     {
         $this->document = new DOMDocument();
     }
+    public function scope(array $newVariables=[]):Environment{
+        $ret=clone $this;
+        $ret->variables=array_merge($ret->variables, $newVariables);
+        return $ret;
+    }
 }
