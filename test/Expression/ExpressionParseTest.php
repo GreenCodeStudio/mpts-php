@@ -5,6 +5,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
+use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
 use MKrawczyk\Mpts\Parser\ExpressionParser;

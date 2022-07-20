@@ -6,6 +6,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
+use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
 
@@ -31,6 +32,10 @@ class ExpressionParser extends AbstractParser
             $char = $this->text[$this->position];
             if (preg_match("/\s/", $char)) {
                 $this->position++;
+            } else if ($lastNode && $char == '.') {
+                $this->position++;
+                $name = $this->readUntill('/[\'"\(\)=\.\s]/');
+                $lastNode = new TEProperty($lastNode, $name);
             } else if (preg_match("/[0-9\.\-+]/", $char)) {
                 $value = $this->readUntill("/\s/");
                 $lastNode = new TENumber(+$value);
@@ -71,7 +76,7 @@ class ExpressionParser extends AbstractParser
                 $right = $this->parseNormal();
                 $lastNode = new TEEqual($lastNode, $right);
             } else {
-                $name = $this->readUntill("/['\"\(\)=\s]/");
+                $name = $this->readUntill("/['\"\(\)=\.\s]/");
                 if ($name == "true") {
                     $lastNode = new TEBoolean(true);
                 } else if ($name == "false") {
