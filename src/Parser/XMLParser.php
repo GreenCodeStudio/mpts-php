@@ -248,8 +248,8 @@ class XMLParser extends AbstractParser
             } else {
                 throw new MptsParserError("Last opened element is not <:loop>");
             }
-        } elseif ($tagName == ':if') {
-            if ($last instanceof TForeacj) {
+        } elseif ($tagName == ':foreach') {
+            if ($last instanceof TForeach) {
                 array_pop($this->openElements);
             } else {
                 throw new MptsParserError("Last opened element is not <:foreach>");

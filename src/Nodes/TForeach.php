@@ -9,9 +9,9 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEExpression;
 class TForeach extends TNode
 {
     public $children = [];
-    private TEExpression $collection;
-    private ?string $item;
-    private ?string $key;
+    public TEExpression $collection;
+    public ?string $item;
+    public ?string $key;
 
     public function __construct(TEExpression $collection, ?string $item = null, ?string $key = null)
     {

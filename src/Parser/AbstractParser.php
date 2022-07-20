@@ -21,4 +21,17 @@ abstract class  AbstractParser
     {
         return $this->readUntill("/\S/");
     }
+
+    protected function readUntillText(string $text)
+    {
+        $ret = "";
+
+        while ($this->position < strlen($this->text)) {
+            $char = $this->text[$this->position];
+            if (substr($this->text, $this->position, strlen($text)) == $text) break;
+            $ret .= $char;
+            $this->position++;
+        }
+        return $ret;
+    }
 }

@@ -6,6 +6,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
 use MKrawczyk\Mpts\Nodes\TAttribute;
 use MKrawczyk\Mpts\Nodes\TComment;
+use MKrawczyk\Mpts\Nodes\TForeach;
 use MKrawczyk\Mpts\Nodes\TIf;
 use MKrawczyk\Mpts\Parser\XMLParser;
 use MKrawczyk\Mpts\Nodes\TDocumentFragment;
@@ -14,7 +15,7 @@ use MKrawczyk\Mpts\Nodes\TElement;
 use PHPUnit\Framework\TestCase;
 
 
-class XMLParserTest extends TestCase
+class  XMLParserTest extends TestCase
 {
     public function testBasicText()
     {
@@ -173,5 +174,13 @@ class XMLParserTest extends TestCase
         $this->assertEquals("b", $obj->children[0]->item);
         $this->assertEquals("c", $obj->children[0]->key);
         $this->assertInstanceOf(TElement::class, $obj->children[0]->children[0]);
+    }
+    public function testForeachInsideElement()
+    {
+        $obj = XMLParser::Parse("<select><:foreach collection=a>b</:foreach></select>");
+
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $this->assertInstanceOf(TForeach::class, $obj->children[0]->children[0]);
     }
 }
