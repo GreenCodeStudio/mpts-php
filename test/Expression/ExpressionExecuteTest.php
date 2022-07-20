@@ -111,4 +111,14 @@ class ExpressionExecuteTest extends TestCase
         $env->variables['d'] = 4;
         $this->assertEquals(true, $obj->execute($env));
     }
+
+    public function testMethodCall()
+    {
+        $obj = ExpressionParser::Parse('fun(x)');
+
+        $env = new Environment();
+        $env->variables['x'] = 1;
+        $env->variables['fun'] = fn($z)=>$z*10;
+        $this->assertEquals(10, $obj->execute($env));
+    }
 }

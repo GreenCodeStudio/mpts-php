@@ -2,6 +2,8 @@
 
 use MKrawczyk\Mpts\Environment;
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
+use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
+use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
@@ -84,7 +86,7 @@ class ExpressionParseTest extends TestCase
 
     public function testString2()
     {
-        $obj = ExpressionParser::Parse('a==b');
+        $obj = ExpressionParser::Parse('"text"');
 
         $this->assertInstanceOf(TEString::class, $obj);
         $this->assertEquals("text", $obj->value);
@@ -117,5 +119,16 @@ class ExpressionParseTest extends TestCase
         $this->assertEquals("c", $obj->right->left->name);
         $this->assertInstanceOf(TEVariable::class, $obj->right->right);
         $this->assertEquals("d", $obj->right->right->name);
+    }
+
+    public function testMethodCall()
+    {
+        $obj = ExpressionParser::Parse('fun(x)');
+
+        $this->assertInstanceOf(TEMethodCall::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->source);
+        $this->assertEquals("fun", $obj->source->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->args[0]);
+        $this->assertEquals("x", $obj->args[0]->name);
     }
 }

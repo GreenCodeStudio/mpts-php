@@ -7,7 +7,7 @@ use MKrawczyk\Mpts\Environment;
 
 class TENumber extends TEExpression
 {
-    private int|float $value;
+    public int|float $value;
 
     public function __construct(int|float $number = 0)
     {

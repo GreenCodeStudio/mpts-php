@@ -4,6 +4,7 @@ namespace MKrawczyk\Mpts\Parser;
 
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
+use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
@@ -23,7 +24,7 @@ class ExpressionParser extends AbstractParser
         return (new ExpressionParser($text))->parseNormal();
     }
 
-    public function parseNormal($endLevel=0)
+    public function parseNormal($endLevel = 0)
     {
         $lastNode = null;
         while ($this->position < strlen($this->text)) {
@@ -41,11 +42,24 @@ class ExpressionParser extends AbstractParser
                 $this->position++;
                 $lastNode = new TEString($this->readUntill("/'/"));
                 $this->position++;
-            }else if ($char == "(") {
-                $this->position++;
-                $value = $this->parseNormal(1);
-                $this->position++;
-                $lastNode = $value;
+            } else if ($char == "(") {
+                if ($lastNode) {
+                    $lastNode = new TEMethodCall($lastNode);
+                    $this->position++;
+                    $this->skipWhitespace();
+                    while ($this->text[$this->position] != ')') {
+                        if ($this->position >= strlen($this->text)) throw new \Exception("Unexpected end of input");
+
+                        $value = $this->parseNormal(2);
+                        $lastNode->args[] = $value;
+                    }
+                    $this->position++;
+                } else {
+                    $this->position++;
+                    $value = $this->parseNormal(1);
+                    $this->position++;
+                    $lastNode = $value;
+                }
             } else if ($char == ")") {
                 if ($endLevel >= 1) {
                     break;
@@ -62,9 +76,9 @@ class ExpressionParser extends AbstractParser
                     $lastNode = new TEBoolean(true);
                 } else if ($name == "false") {
                     $lastNode = new TEBoolean(false);
-                } else if($name=='') {
-                    Throw new \Exception("Empty variable name");
-                }else {
+                } else if ($name == '') {
+                    throw new \Exception("Empty variable name");
+                } else {
                     $lastNode = new TEVariable($name);
                 }
             }
