@@ -101,6 +101,17 @@ class ExecutionTest extends TestCase
         $result1 = $obj->execute($env);
         $this->assertEquals('c', $this->fragmentToHtml($result1));
     }
+    public function testIRealExample()
+    {
+        $obj = XMLParser::Parse('<:if condition=canAdd><a class="button" href="/PalletMovement/add"><span class="icon-add"></span>Dodaj</a></:if>');
+        $env = new Environment();
+        $env->document = new DOMDocument();
+
+        $env->variables['canAdd'] = true;
+        $result1 = $obj->execute($env);
+        $this->assertEquals('<a class="button" href="/PalletMovement/add"><span class="icon-add"></span>Dodaj</a>', $this->fragmentToHtml($result1));
+
+    }
 
     public function testLoop()
     {

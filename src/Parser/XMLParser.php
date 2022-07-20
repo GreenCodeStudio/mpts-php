@@ -56,7 +56,7 @@ class XMLParser extends AbstractParser
                     if (str_starts_with($result->element->tagName, ':')) {
                         $this->convertToSpecialElement($result, $element);
                     } else {
-                        $element->children[] = $result->element;
+                        $element->addChild($result->element);
                         if (!$result->autoclose)
                             $this->openElements[] = $result->element;
                     }
