@@ -12,7 +12,9 @@ class TDocumentFragment extends TNode
     {
         $ret = $env->document->createDocumentFragment();
         foreach ($this->children as $child) {
-            $ret->appendChild($child->execute($env));
+            $result=$child->execute($env);
+            if($result instanceof \DOMDocumentFragment && !$result->firstChild) continue;
+            $ret->appendChild($result);
         }
         return $ret;
     }

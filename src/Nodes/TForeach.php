@@ -35,7 +35,9 @@ class TForeach extends TNode
                 if ($this->key)
                     $envScoped->variables[$this->key] = $i;
 
-                $ret->appendChild($child->execute($envScoped));
+                $result = $child->execute($envScoped);
+                if ($result)
+                    $ret->appendChild($result);
             }
             $i++;
         }

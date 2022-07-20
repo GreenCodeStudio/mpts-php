@@ -149,4 +149,14 @@ class ExecutionTest extends TestCase
         $result = $obj->execute($env);
         $this->assertEquals('<div>0:a</div><div>1:b</div><div>2:c</div><div>3:d</div><div>4:e</div>', $this->fragmentToHtml($result));
     }
+
+    public function testForeachIfFalse()
+    {
+        $obj = XMLParser::Parse("<:foreach collection=a><:if condition=false>A</:if></:foreach>");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['a'] = [1,2,3,4,5];
+        $result = $obj->execute($env);
+        $this->assertEquals('', $this->fragmentToHtml($result));
+    }
 }
