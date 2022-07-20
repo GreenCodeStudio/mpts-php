@@ -13,6 +13,7 @@ use MKrawczyk\Mpts\Nodes\TText;
 use MKrawczyk\Mpts\Nodes\TElement;
 use PHPUnit\Framework\TestCase;
 
+
 class XMLParserTest extends TestCase
 {
     public function testBasicText()
@@ -113,6 +114,16 @@ class XMLParserTest extends TestCase
         $this->assertInstanceOf(TDocumentFragment::class, $obj);
         $this->assertInstanceOf(TComment::class, $obj->children[0]);
         $this->assertEquals("comment", $obj->children[0]->text);
+    }
+    public function test2Comments()
+    {
+        $obj = XMLParser::Parse("<!--comment1--><!--comment2-->");
+
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TComment::class, $obj->children[0]);
+        $this->assertEquals("comment1", $obj->children[0]->text);
+        $this->assertInstanceOf(TComment::class, $obj->children[1]);
+        $this->assertEquals("comment2", $obj->children[1]->text);
     }
 
     public function testIf()

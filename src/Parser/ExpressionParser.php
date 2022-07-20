@@ -23,7 +23,7 @@ class ExpressionParser extends AbstractParser
         return (new ExpressionParser($text))->parseNormal();
     }
 
-    public function parseNormal()
+    public function parseNormal($endLevel=0)
     {
         $lastNode = null;
         while ($this->position < strlen($this->text)) {
@@ -41,6 +41,17 @@ class ExpressionParser extends AbstractParser
                 $this->position++;
                 $lastNode = new TEString($this->readUntill("/'/"));
                 $this->position++;
+            }else if ($char == "(") {
+                $this->position++;
+                $value = $this->parseNormal(1);
+                $this->position++;
+                $lastNode = $value;
+            } else if ($char == ")") {
+                if ($endLevel >= 1) {
+                    break;
+                } else {
+                    throw new \Exception("( not opened");
+                }
             } else if ($char == '=' && $this->text[$this->position + 1] == "=") {
                 $this->position += 2;
                 $right = $this->parseNormal();
@@ -51,7 +62,9 @@ class ExpressionParser extends AbstractParser
                     $lastNode = new TEBoolean(true);
                 } else if ($name == "false") {
                     $lastNode = new TEBoolean(false);
-                } else {
+                } else if($name=='') {
+                    Throw new \Exception("Empty variable name");
+                }else {
                     $lastNode = new TEVariable($name);
                 }
             }

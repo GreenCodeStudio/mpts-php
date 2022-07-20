@@ -13,4 +13,8 @@ abstract class TNode
         $result = $this->execute($env);
         return $env->document->saveHTML($result);
     }
+    public function addChild($child)
+    {
+        $this->children[] = $child;
+    }
 }

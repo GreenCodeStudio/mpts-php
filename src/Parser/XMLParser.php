@@ -30,7 +30,8 @@ class XMLParser extends AbstractParser
         while ($this->position < strlen($this->text)) {
             $char = $this->text[$this->position];
             $element = end($this->openElements);
-            $last = end($element->children);
+            $elementChildren=$element->children;
+            $last = end($elementChildren);
             if ($char == '<') {
                 if (substr($this->text, $this->position, 4) == '<!--') {
                     $this->position += 4;
@@ -69,7 +70,7 @@ class XMLParser extends AbstractParser
             } else {
                 if (!$last || !($last instanceof TText)) {
                     $last = new TText();
-                    $element->children[] = $last;
+                    $element->addChild( $last);
                 }
                 $last->text .= $char;
                 $this->position++;
@@ -180,7 +181,7 @@ class XMLParser extends AbstractParser
 
             if (!$result->autoclose)
                 $this->openElements[] = $node;
-        } else if (strtolower($result->element->tegName) == ":else-if") {
+        } else if (strtolower($result->element->tagName) == ":else-if") {
             $last = end($element->children);
             if (!($last instanceof TIf && $last->else == null))
                 throw new MptsParserError("need if before else-if");
@@ -190,7 +191,7 @@ class XMLParser extends AbstractParser
 
             if (!$result->autoclose)
                 $this->openElements[] = $last;
-        } else if (strtolower($result->element->tegName) == ":else") {
+        } else if (strtolower($result->element->tagName) == ":else") {
             $last = end($element->children);
             if (!($last instanceof TIf && $last->else == null))
                 throw new MptsParserError("need if before else");
@@ -199,13 +200,13 @@ class XMLParser extends AbstractParser
 
             if (!$result->autoclose)
                 $this->openElements[] = $last;
-        } else if (strtolower($result->element->tegName) == ":loop") {
+        } else if (strtolower($result->element->tagName) == ":loop") {
             $count = $result->element->getAttribute('count')->expression;
             $node = new TLoop($count);
             $element->children[] = $node;
             if (!$result->autoclose)
                 $this->openElements[] = $node;
-        } else if (strtolower($result->element->tegName) == ":foreach") {
+        } else if (strtolower($result->element->tagName) == ":foreach") {
             $collection = $result->element->getAttribute('collection')->expression;
             $item = $result->element->getAttribute('item')?->expression->name;
             $key = $result->element->getAttribute('key')?->expression->name;

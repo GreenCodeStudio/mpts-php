@@ -18,7 +18,7 @@ class TIf extends TNode
             }
         }
         if ($this->else) {
-            return $this->executeCondition($condition, $env);
+            return $this->executeCondition($this->else, $env);
         }
         return null;
     }
@@ -39,5 +39,17 @@ class TIf extends TNode
     {
         if ($this->else) return $this->else->children[] = $child;
         else end($this->conditions)->children[] = $child;
+    }
+
+    public function getChildren()
+    {
+        if ($this->else) return $this->else->children;
+        else return end($this->conditions)->children;
+    }
+
+    public function __get($name)
+    {
+        if ($name == 'children')
+            return $this->getChildren();
     }
 }
