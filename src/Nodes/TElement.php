@@ -18,7 +18,9 @@ class TElement extends TNode
             $ret->setAttribute($attr->name, $attr->expression->execute($env));
         }
         foreach ($this->children as $child) {
-            $ret->appendChild($child->execute($env));
+            $result = $child->execute($env);
+            if (!empty($result))
+                $ret->appendChild($result);
         }
         return $ret;
     }
@@ -27,6 +29,7 @@ class TElement extends TNode
     {
         return FunQuery::create($this->attributes)->firstOrNull(fn($x) => $x->name == $name);
     }
+
     public function addChild($child)
     {
         $this->children[] = $child;
