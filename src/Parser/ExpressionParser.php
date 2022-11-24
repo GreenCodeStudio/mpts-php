@@ -2,7 +2,9 @@
 
 namespace MKrawczyk\Mpts\Parser;
 
+use MKrawczyk\Mpts\Nodes\Expressions\TEAdd;
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
+use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
@@ -36,8 +38,8 @@ class ExpressionParser extends AbstractParser
                 $this->position++;
                 $name = $this->readUntill('/[\'"\(\)=\.\s]/');
                 $lastNode = new TEProperty($lastNode, $name);
-            } else if (preg_match("/[0-9\.\-+]/", $char)) {
-                $value = $this->readUntill("/\s/");
+            } else if (preg_match("/[+-]?[0-9\.]/", $char)) {
+                $value = $this->readUntill("/[\s\+\-]/");
                 $lastNode = new TENumber(+$value);
             } else if ($char == '"') {
                 $this->position++;
@@ -75,6 +77,14 @@ class ExpressionParser extends AbstractParser
                 $this->position += 2;
                 $right = $this->parseNormal();
                 $lastNode = new TEEqual($lastNode, $right);
+            }else if ($char == '+') {
+                $this->position += 1;
+                $right = $this->parseNormal();
+                $lastNode = new TEAdd($lastNode, $right);
+            } else if ($char == ':') {
+                $this->position += 1;
+                $right = $this->parseNormal();
+                $lastNode = new TEConcatenate($lastNode, $right);
             } else {
                 $name = $this->readUntill("/['\"\(\)=\.\s]/");
                 if ($name == "true") {

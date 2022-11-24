@@ -44,7 +44,7 @@ class ExpressionExecuteTest extends TestCase
         $obj = ExpressionParser::Parse("var1.sub.sub2");
 
         $env = new Environment();
-        $env->variables['var1'] = (object)['sub'=>['sub2'=>new StdClass()]];
+        $env->variables['var1'] = (object)['sub' => ['sub2' => new StdClass()]];
         $this->assertEquals($env->variables['var1']->sub['sub2'], $obj->execute($env));
     }
 
@@ -69,7 +69,7 @@ class ExpressionExecuteTest extends TestCase
         $obj = ExpressionParser::Parse("1.23e2");
 
         $env = new Environment();
-        $this->assertEquals(1.23, $obj->execute($env));
+        $this->assertEquals(1.23e2, $obj->execute($env));
     }
 
     public function testString1()
@@ -118,7 +118,15 @@ class ExpressionExecuteTest extends TestCase
 
         $env = new Environment();
         $env->variables['x'] = 1;
-        $env->variables['fun'] = fn($z)=>$z*10;
+        $env->variables['fun'] = fn($z) => $z * 10;
+        $this->assertEquals(10, $obj->execute($env));
+    }
+
+    public function testAdd()
+    {
+        $obj = ExpressionParser::Parse("2+5 + 3");
+
+        $env = new Environment();
         $this->assertEquals(10, $obj->execute($env));
     }
 }

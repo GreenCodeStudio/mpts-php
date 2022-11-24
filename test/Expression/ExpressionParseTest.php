@@ -1,6 +1,7 @@
 <?php
 
 use MKrawczyk\Mpts\Environment;
+use MKrawczyk\Mpts\Nodes\Expressions\TEAdd;
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
@@ -131,5 +132,16 @@ class ExpressionParseTest extends TestCase
         $this->assertEquals("fun", $obj->source->name);
         $this->assertInstanceOf(TEVariable::class, $obj->args[0]);
         $this->assertEquals("x", $obj->args[0]->name);
+    }
+
+    public function testAdd()
+    {
+        $obj = ExpressionParser::Parse('a+b');
+
+        $this->assertInstanceOf(TEAdd::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("a", $obj->left->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->right);
+        $this->assertEquals("b", $obj->right->name);
     }
 }
