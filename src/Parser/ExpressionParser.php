@@ -10,6 +10,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
+use MKrawczyk\Mpts\Nodes\Expressions\TESubtract;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
 
 class ExpressionParser extends AbstractParser
@@ -77,10 +78,14 @@ class ExpressionParser extends AbstractParser
                 $this->position += 2;
                 $right = $this->parseNormal();
                 $lastNode = new TEEqual($lastNode, $right);
-            }else if ($char == '+') {
+            } else if ($char == '+') {
                 $this->position += 1;
                 $right = $this->parseNormal();
                 $lastNode = new TEAdd($lastNode, $right);
+            } else if ($char == '-') {
+                $this->position += 1;
+                $right = $this->parseNormal();
+                $lastNode = new TESubtract($lastNode, $right);
             } else if ($char == ':') {
                 $this->position += 1;
                 $right = $this->parseNormal();

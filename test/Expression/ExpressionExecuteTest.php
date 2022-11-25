@@ -129,4 +129,11 @@ class ExpressionExecuteTest extends TestCase
         $env = new Environment();
         $this->assertEquals(10, $obj->execute($env));
     }
+    public function testSub()
+    {
+        $obj = ExpressionParser::Parse("2-5 - 3");
+
+        $env = new Environment();
+        $this->assertEquals(-6, $obj->execute($env));
+    }
 }
