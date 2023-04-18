@@ -49,7 +49,7 @@ class XMLParser extends AbstractParser
                     } else if ($element instanceof TElement && $element->tagName == $name) {
                         array_pop($this->openElements);
                     } else {
-                        throw new \Exception("Element <$name> not opened as last");
+                        $this->throw("Last opened element is not <$name>");
                     }
 
                 } else {
@@ -77,6 +77,10 @@ class XMLParser extends AbstractParser
                 $last->text .= $char;
                 $this->position++;
             }
+        }
+        if (count($this->openElements) > 1) {
+            $tagName=$this->openElements[count($this->openElements) - 1]->tagName;
+            $this->throw("Element <$tagName> not closed");
         }
         return $this->openElements[0];
     }

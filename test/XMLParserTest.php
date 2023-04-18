@@ -8,6 +8,7 @@ use MKrawczyk\Mpts\Nodes\TAttribute;
 use MKrawczyk\Mpts\Nodes\TComment;
 use MKrawczyk\Mpts\Nodes\TForeach;
 use MKrawczyk\Mpts\Nodes\TIf;
+use MKrawczyk\Mpts\Nodes\TLoop;
 use MKrawczyk\Mpts\Parser\XMLParser;
 use MKrawczyk\Mpts\Nodes\TDocumentFragment;
 use MKrawczyk\Mpts\Nodes\TText;
@@ -50,7 +51,7 @@ class  XMLParserTest extends TestCase
     public function testNotOpenedElement()
     {
         $this->expectExceptionMessageMatches("/Last opened element is not <div>/");
-        $obj = XMLParser::Parse("<div>");
+        $obj = XMLParser::Parse("</div>");
     }
 
     public function testElementsInside()

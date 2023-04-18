@@ -34,4 +34,10 @@ abstract class  AbstractParser
         }
         return $ret;
     }
+    protected function throw($message)
+    {
+        $lines = explode("\n", substr($this->text, 0, $this->position));
+        throw new MptsParserError($message, count($lines), strlen($lines[count($lines) - 1]), substr($this->text, $this->position, 10));
+    }
+
 }
