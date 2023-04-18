@@ -37,10 +37,10 @@ class ExpressionParser extends AbstractParser
                 $this->position++;
             } else if ($lastNode && $char == '.') {
                 $this->position++;
-                $name = $this->readUntill('/[\'"\(\)=\.\s]/');
+                $name = $this->readUntill('/[\'"\(\)=\.:\s]/');
                 $lastNode = new TEProperty($lastNode, $name);
-            } else if (preg_match("/[+-]?[0-9\.]/", $char)) {
-                $value = $this->readUntill("/[\s\+\-]/");
+            } else if (preg_match("/[0-9\.\-+]/", $char)) {
+                $value = $this->readUntill("/[^0-9\.\-+e]/");
                 $lastNode = new TENumber(+$value);
             } else if ($char == '"') {
                 $this->position++;
@@ -76,7 +76,7 @@ class ExpressionParser extends AbstractParser
                 }
             } else if ($char == '=' && $this->text[$this->position + 1] == "=") {
                 $this->position += 2;
-                $right = $this->parseNormal();
+                $right = $this->parseNormal(2);
                 $lastNode = new TEEqual($lastNode, $right);
             } else if ($char == '+') {
                 $this->position += 1;
@@ -88,10 +88,19 @@ class ExpressionParser extends AbstractParser
                 $lastNode = new TESubtract($lastNode, $right);
             } else if ($char == ':') {
                 $this->position += 1;
-                $right = $this->parseNormal();
+                $right = $this->parseNormal(3);
                 $lastNode = new TEConcatenate($lastNode, $right);
+            } else if ($char == ">" || $char == "\\") {
+                if ($lastNode) {
+                    break;
+                } else {
+                    throw new \Exception("Unexpected character");
+                }
             } else {
-                $name = $this->readUntill("/['\"\(\)=\.\s]/");
+                if ($lastNode) {
+                    break;
+                }
+                $name = $this->readUntill("/['\"\(\)=\.\s:>\/]/");
                 if ($name == "true") {
                     $lastNode = new TEBoolean(true);
                 } else if ($name == "false") {

@@ -159,4 +159,13 @@ class ExecutionTest extends TestCase
         $result = $obj->execute($env);
         $this->assertEquals('', $this->fragmentToHtml($result));
     }
+    public function testAttributeConcat()
+    {
+        $obj = XMLParser::Parse("<div ab=\"cd\":x:\"gh\"/>");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['x'] = 'ef';
+        $result = $obj->execute($env);
+        $this->assertEquals("<div ab=\"cdefgh\"></div>", $this->fragmentToHtml($result));
+    }
 }

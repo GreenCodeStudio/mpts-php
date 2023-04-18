@@ -2,6 +2,9 @@
   "name": "mkrawczyk/mpts",
   "type": "library",
   "license": "MIT",
+  "scripts": {
+    "test": "phpunit test"
+  },
   "autoload": {
     "psr-4": {
       "MKrawczyk\\Mpts\\": "src/"

@@ -10,6 +10,7 @@ use MKrawczyk\Mpts\Nodes\TElement;
 use MKrawczyk\Mpts\Nodes\TExpressionText;
 use MKrawczyk\Mpts\Nodes\TForeach;
 use MKrawczyk\Mpts\Nodes\TIf;
+use MKrawczyk\Mpts\Nodes\TLoop;
 use MKrawczyk\Mpts\Nodes\TText;
 
 class XMLParser extends AbstractParser
@@ -31,7 +32,7 @@ class XMLParser extends AbstractParser
         while ($this->position < strlen($this->text)) {
             $char = $this->text[$this->position];
             $element = end($this->openElements);
-            $elementChildren=$element->children;
+            $elementChildren = $element->children;
             $last = end($elementChildren);
             if ($char == '<') {
                 if (substr($this->text, $this->position, 4) == '<!--') {
@@ -71,7 +72,7 @@ class XMLParser extends AbstractParser
             } else {
                 if (!$last || !($last instanceof TText)) {
                     $last = new TText();
-                    $element->addChild( $last);
+                    $element->addChild($last);
                 }
                 $last->text .= $char;
                 $this->position++;
@@ -103,7 +104,7 @@ class XMLParser extends AbstractParser
             } else if (preg_match("/\s/", $char)) {
                 $this->position++;
             } else {
-                $name = $this->readUntill("/[\s=]/");
+                $name = $this->readUntill("/[\s=\/]/");
                 $value = null;
                 $this->skipWhitespace();
                 $char = $this->text[$this->position];
@@ -111,20 +112,14 @@ class XMLParser extends AbstractParser
                     $this->position++;
                     $this->skipWhitespace();
                     $char2 = $this->text[$this->position];
-                    if ($char2 == '"') {
-                        $this->position++;
-                        $value = new TEString($this->readUntill('/"/'));
-                        $this->position++;
-                    } else if ($char2 == "'") {
-                        $this->position++;
-                        $value = new TEString($this->readUntill("/'/"));
-                        $this->position++;
-                    } else if ($char2 == '(') {
+                    if ($char2 == '(') {
                         $this->position++;
                         $value = ExpressionParser::Parse($this->readUntill('/\)/'));
                         $this->position++;
                     } else {
-                        $value = ExpressionParser::Parse($this->readUntill('/[\s>\/]/'));
+                        $parser = (new ExpressionParser(substr($this->text, $this->position)));
+                        $value = $parser->parseNormal();
+                        $this->position += $parser->position;
                     }
                 }
                 $element->attributes[] = new TAttribute($name, $value);

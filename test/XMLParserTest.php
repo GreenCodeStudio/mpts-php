@@ -107,6 +107,17 @@ class  XMLParserTest extends TestCase
         $this->assertInstanceOf(TEVariable::class, $obj->children[0]->attributes[1]->expression);
         $this->assertEquals("v2", $obj->children[0]->attributes[1]->expression->name);
     }
+    public function testElementWithBooleanAtribute()
+    {
+        $obj = XMLParser::Parse("<textarea required/>");
+
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $this->assertEquals("textarea", $obj->children[0]->tagName);
+        $this->assertInstanceOf(TAttribute::class, $obj->children[0]->attributes[0]);
+        $this->assertEquals("required", $obj->children[0]->attributes[0]->name);
+        $this->assertEquals(null, $obj->children[0]->attributes[0]->expression);
+    }
 
     public function testComment()
     {
