@@ -5,6 +5,13 @@
   "scripts": {
     "test": "phpunit test"
   },
+  "keywords": [
+    "templating",
+    "html",
+    "php",
+    "xml",
+    "template engine"
+  ],
   "autoload": {
     "psr-4": {
       "MKrawczyk\\Mpts\\": "src/"
