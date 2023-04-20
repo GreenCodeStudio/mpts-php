@@ -195,4 +195,12 @@ class  XMLParserTest extends TestCase
         $this->assertInstanceOf(TElement::class, $obj->children[0]);
         $this->assertInstanceOf(TForeach::class, $obj->children[0]->children[0]);
     }
+    public function testCommentAfterElement()
+    {
+        $obj = XMLParser::Parse("<tr data-amount=article.amount><!--comment--></tr>");
+
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $this->assertInstanceOf(TComment::class, $obj->children[0]->children[0]);
+    }
 }

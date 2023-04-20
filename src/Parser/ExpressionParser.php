@@ -37,7 +37,7 @@ class ExpressionParser extends AbstractParser
                 $this->position++;
             } else if ($lastNode && $char == '.') {
                 $this->position++;
-                $name = $this->readUntill('/[\'"\(\)=\.:\s]/');
+                $name = $this->readUntill('/[\'"\(\)=\.:\s>]/');
                 $lastNode = new TEProperty($lastNode, $name);
             } else if (preg_match("/[0-9\.\-+]/", $char)) {
                 $value = $this->readUntill("/[^0-9\.\-+e]/");

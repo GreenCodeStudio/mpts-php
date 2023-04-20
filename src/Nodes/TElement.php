@@ -15,7 +15,10 @@ class TElement extends TNode
     {
         $ret = $env->document->createElement($this->tagName);
         foreach ($this->attributes as $attr) {
-            $ret->setAttribute($attr->name, $attr->expression->execute($env));
+            if ($attr->expression == null)
+                $ret->setAttribute($attr->name, $attr->name);
+            else
+                $ret->setAttribute($attr->name, $attr->expression->execute($env));
         }
         foreach ($this->children as $child) {
             $result = $child->execute($env);

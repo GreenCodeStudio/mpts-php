@@ -10,7 +10,8 @@
     "html",
     "php",
     "xml",
-    "template engine"
+    "template engine",
+    "mpts"
   ],
   "autoload": {
     "psr-4": {
