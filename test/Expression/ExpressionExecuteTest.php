@@ -146,4 +146,27 @@ class ExpressionExecuteTest extends TestCase
         $env->variables['var1'] = "val";
         $this->assertEquals("val", $obj->execute($env));
     }
+    public function testOrNullProperty(){
+        $obj = ExpressionParser::Parse('var1.property??"empty"');
+
+        $env = new Environment();
+        $this->assertEquals("empty", $obj->execute($env));
+        $env->variables['var1'] = null;
+        $this->assertEquals("empty", $obj->execute($env));
+        $env->variables['var1'] = [];
+        $this->assertEquals("empty", $obj->execute($env));
+        $env->variables['var1'] = ['property' => null];
+        $this->assertEquals("empty", $obj->execute($env));
+        $env->variables['var1'] = ['property' => 'val'];
+        $this->assertEquals("val", $obj->execute($env));
+
+
+        $this->assertEquals("empty", $obj->execute($env));
+        $env->variables['var1'] = (object)[];
+        $this->assertEquals("empty", $obj->execute($env));
+        $env->variables['var1'] = (object)['property' => null];
+        $this->assertEquals("empty", $obj->execute($env));
+        $env->variables['var1'] = (object)['property' => 'val'];
+        $this->assertEquals("val", $obj->execute($env));
+    }
 }
