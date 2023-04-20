@@ -15,7 +15,7 @@ class TEOrNull extends TEExpression
         $this->right = $right;
     }
 
-    public function execute(Environment $env): bool
+    public function execute(Environment $env)
     {
         $subEnv = clone $env;
         $subEnv->allowUndefined = true;
