@@ -15,7 +15,7 @@ class TESubtract extends TEExpression
         $this->right = $right;
     }
 
-    public function execute(Environment $env): bool
+    public function execute(Environment $env)
     {
         return $this->left->execute($env) - $this->right->execute($env);
     }

@@ -39,9 +39,10 @@ class ExpressionParser extends AbstractParser
                 $this->position++;
                 $name = $this->readUntill('/[\'"\(\)=\.:\s>]/');
                 $lastNode = new TEProperty($lastNode, $name);
-            } else if (preg_match("/[0-9\.\-+]/", $char)) {
-                $value = $this->readUntill("/[^0-9\.\-+e]/");
-                $lastNode = new TENumber(+$value);
+            } else if (!$lastNode && preg_match("/[0-9\.]/", $char)) {
+                $this->position++;
+                $value = $char.$this->readUntill("/[^0-9\.e]/");
+                $lastNode = new TENumber((float)$value);
             } else if ($char == '"') {
                 $this->position++;
                 $lastNode = new TEString($this->readUntill('/"/'));
@@ -79,12 +80,18 @@ class ExpressionParser extends AbstractParser
                 $right = $this->parseNormal(2);
                 $lastNode = new TEEqual($lastNode, $right);
             } else if ($char == '+') {
+                if ($endLevel >= 4) {
+                    break;
+                }
                 $this->position += 1;
-                $right = $this->parseNormal();
+                $right = $this->parseNormal(4);
                 $lastNode = new TEAdd($lastNode, $right);
             } else if ($char == '-') {
+                if ($endLevel >= 4) {
+                    break;
+                }
                 $this->position += 1;
-                $right = $this->parseNormal();
+                $right = $this->parseNormal(4);
                 $lastNode = new TESubtract($lastNode, $right);
             } else if ($char == ':') {
                 $this->position += 1;
@@ -100,7 +107,7 @@ class ExpressionParser extends AbstractParser
                 if ($lastNode) {
                     break;
                 }
-                $name = $this->readUntill("/['\"\(\)=\.\s:>\/]/");
+                $name = $this->readUntill("/['\"\(\)=\.\s:>\/+\-*]/");
                 if ($name == "true") {
                     $lastNode = new TEBoolean(true);
                 } else if ($name == "false") {
