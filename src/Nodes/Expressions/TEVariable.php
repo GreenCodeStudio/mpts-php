@@ -15,6 +15,11 @@ class TEVariable extends TEExpression
 
     public function execute(Environment $env)
     {
-        return $env->variables[$this->name];
+
+        if ($env->allowUndefined) {
+            return $env->variables[$this->name] ?? null;
+        } else {
+            return $env->variables[$this->name];
+        }
     }
 }

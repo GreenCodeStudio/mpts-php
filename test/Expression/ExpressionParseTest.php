@@ -6,6 +6,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
+use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
@@ -143,5 +144,15 @@ class ExpressionParseTest extends TestCase
         $this->assertEquals("a", $obj->left->name);
         $this->assertInstanceOf(TEVariable::class, $obj->right);
         $this->assertEquals("b", $obj->right->name);
+    }
+    public function testOrNull()
+    {
+        $obj = ExpressionParser::Parse('var1??"empty"');
+
+        $this->assertInstanceOf(TEOrNull::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("var1", $obj->left->name);
+        $this->assertInstanceOf(TEString::class, $obj->right);
+        $this->assertEquals("empty", $obj->right->value);
     }
 }

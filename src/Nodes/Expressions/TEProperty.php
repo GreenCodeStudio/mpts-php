@@ -19,9 +19,16 @@ class TEProperty extends TEExpression
     {
         $obj = $this->source->execute($env);
         $name = $this->name;
-        if (is_array($obj))
-            return $obj[$name];
-        else
-            return $obj->$name;
+        if ($env->allowUndefined) {
+            if (is_array($obj))
+                return $obj[$name]??null;
+            else
+                return ($obj->$name)??null;
+        } else {
+            if (is_array($obj))
+                return $obj[$name];
+            else
+                return $obj->$name;
+        }
     }
 }

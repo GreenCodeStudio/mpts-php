@@ -7,6 +7,7 @@ use DOMDocument;
 class Environment
 {
     public bool $allowExecution = false;
+    public bool $allowUndefined = false;
     public array $variables = [];
     public DOMDocument $document;
     public function __construct()

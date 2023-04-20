@@ -8,6 +8,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
+use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TESubtract;
@@ -79,6 +80,13 @@ class ExpressionParser extends AbstractParser
                 $this->position += 2;
                 $right = $this->parseNormal(2);
                 $lastNode = new TEEqual($lastNode, $right);
+            } else if ($char == '?' && $this->text[$this->position + 1] == "?") {
+                if ($endLevel >= 5) {
+                    break;
+                }
+                $this->position += 2;
+                $right = $this->parseNormal(5);
+                $lastNode = new TEOrNull($lastNode, $right);
             } else if ($char == '+') {
                 if ($endLevel >= 4) {
                     break;
@@ -107,7 +115,7 @@ class ExpressionParser extends AbstractParser
                 if ($lastNode) {
                     break;
                 }
-                $name = $this->readUntill("/['\"\(\)=\.\s:>\/+\-*]/");
+                $name = $this->readUntill("/['\"\(\)=\.\s:>\/+\-*?]/");
                 if ($name == "true") {
                     $lastNode = new TEBoolean(true);
                 } else if ($name == "false") {
