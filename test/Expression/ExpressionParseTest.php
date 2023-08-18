@@ -167,4 +167,28 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEString::class, $obj->right);
         $this->assertEquals("empty", $obj->right->value);
     }
+    public function testFunctionCall()
+    {
+        $obj = ExpressionParser::Parse('fun1(param)');
+
+        $this->assertInstanceOf(TEMethodCall::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->source);
+        $this->assertEquals("fun1", $obj->source->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->args[0]);
+        $this->assertEquals("param", $obj->args[0]->name);
+    }
+    public function testFunctionCall2()
+    {
+        $obj = ExpressionParser::Parse('getView("User", "PermissionsEdit", data)');
+
+        $this->assertInstanceOf(TEMethodCall::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->source);
+        $this->assertEquals("getView", $obj->source->name);
+        $this->assertInstanceOf(TEString::class, $obj->args[0]);
+        $this->assertEquals("User", $obj->args[0]->value);
+        $this->assertInstanceOf(TEString::class, $obj->args[1]);
+        $this->assertEquals("PermissionsEdit", $obj->args[1]->value);
+        $this->assertInstanceOf(TEVariable::class, $obj->args[2]);
+        $this->assertEquals("data", $obj->args[2]->name);
+    }
 }

@@ -62,6 +62,8 @@ class ExpressionParser extends AbstractParser
 
                         $value = $this->parseNormal(2);
                         $lastNode->args[] = $value;
+                        if($this->text[$this->position] ==',')
+                            $this->position++;
                     }
                     $this->position++;
                 } else {

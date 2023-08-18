@@ -161,7 +161,7 @@ class ExpressionExecuteTest extends TestCase
         $this->assertEquals("val", $obj->execute($env));
 
 
-        $this->assertEquals("empty", $obj->execute($env));
+
         $env->variables['var1'] = (object)[];
         $this->assertEquals("empty", $obj->execute($env));
         $env->variables['var1'] = (object)['property' => null];
