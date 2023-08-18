@@ -43,6 +43,17 @@ class ExecutionTest extends TestCase
         $this->assertEquals("<div></div>", $result->textContent);
     }
 
+    public function testEncodedHtmlFromVariable()
+    {
+        $obj = XMLParser::Parse("<<element>>");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['element'] = "<div>text</div>";
+        $result = $obj->execute($env);
+        $this->assertEquals("text", $result->textContent);
+        $this->assertEquals("div", $result->firstChild->tagName);
+    }
+
     public function testBasicElement()
     {
         $obj = XMLParser::Parse("<br/>");
@@ -101,6 +112,7 @@ class ExecutionTest extends TestCase
         $result1 = $obj->execute($env);
         $this->assertEquals('c', $this->fragmentToHtml($result1));
     }
+
     public function testIRealExample()
     {
         $obj = XMLParser::Parse('<:if condition=canAdd><a class="button" href="/PalletMovement/add"><span class="icon-add"></span>Dodaj</a></:if>');
@@ -131,21 +143,23 @@ class ExecutionTest extends TestCase
         $result = $obj->execute($env);
         $this->assertEquals('bbb', $this->fragmentToHtml($result));
     }
+
     public function testForeachBasic()
     {
         $obj = XMLParser::Parse("<:foreach collection=a>b</:foreach>");
         $env = new Environment();
         $env->document = new DOMDocument();
-        $env->variables['a'] = [1,2,3,4,5];
+        $env->variables['a'] = [1, 2, 3, 4, 5];
         $result = $obj->execute($env);
         $this->assertEquals('bbbbb', $this->fragmentToHtml($result));
     }
+
     public function testForeachAdvanced()
     {
         $obj = XMLParser::Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</div></:foreach>");
         $env = new Environment();
         $env->document = new DOMDocument();
-        $env->variables['a'] = ['a','b','c','d','e'];
+        $env->variables['a'] = ['a', 'b', 'c', 'd', 'e'];
         $result = $obj->execute($env);
         $this->assertEquals('<div>0:a</div><div>1:b</div><div>2:c</div><div>3:d</div><div>4:e</div>', $this->fragmentToHtml($result));
     }
@@ -155,10 +169,11 @@ class ExecutionTest extends TestCase
         $obj = XMLParser::Parse("<:foreach collection=a><:if condition=false>A</:if></:foreach>");
         $env = new Environment();
         $env->document = new DOMDocument();
-        $env->variables['a'] = [1,2,3,4,5];
+        $env->variables['a'] = [1, 2, 3, 4, 5];
         $result = $obj->execute($env);
         $this->assertEquals('', $this->fragmentToHtml($result));
     }
+
     public function testAttributeConcat()
     {
         $obj = XMLParser::Parse("<div ab=\"cd\":x:\"gh\"/>");

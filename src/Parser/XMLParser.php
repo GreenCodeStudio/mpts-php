@@ -7,6 +7,7 @@ use MKrawczyk\Mpts\Nodes\TAttribute;
 use MKrawczyk\Mpts\Nodes\TComment;
 use MKrawczyk\Mpts\Nodes\TDocumentFragment;
 use MKrawczyk\Mpts\Nodes\TElement;
+use MKrawczyk\Mpts\Nodes\TExpressionSubnode;
 use MKrawczyk\Mpts\Nodes\TExpressionText;
 use MKrawczyk\Mpts\Nodes\TForeach;
 use MKrawczyk\Mpts\Nodes\TIf;
@@ -35,7 +36,14 @@ class XMLParser extends AbstractParser
             $elementChildren = $element->children;
             $last = end($elementChildren);
             if ($char == '<') {
-                if (substr($this->text, $this->position, 4) == '<!--') {
+                if (substr($this->text, $this->position, 2) == '<<') {
+                    $this->position += 2;
+                    $result = $this->parseExpression('>>');
+                    $node = new TExpressionSubnode();
+                    $node->expression = $result;
+                    $element->children[] = $node;
+                }
+                else if (substr($this->text, $this->position, 4) == '<!--') {
                     $this->position += 4;
                     $text = $this->readUntillText('-->');
                     $this->position += 3;
