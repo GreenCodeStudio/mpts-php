@@ -121,6 +121,16 @@ class ExpressionExecuteTest extends TestCase
         $env->variables['fun'] = fn($z) => $z * 10;
         $this->assertEquals(10, $obj->execute($env));
     }
+    public function testMethodCallMultiple()
+    {
+        $obj = ExpressionParser::Parse('fun(first,second)');
+
+        $env = new Environment();
+        $env->variables['first'] = 3;
+        $env->variables['second'] = 7;
+        $env->variables['fun'] = fn($a,$b) => $a*$b;
+        $this->assertEquals(10, $obj->execute($env));
+    }
 
     public function testAdd()
     {

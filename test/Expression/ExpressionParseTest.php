@@ -134,6 +134,20 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEVariable::class, $obj->args[0]);
         $this->assertEquals("x", $obj->args[0]->name);
     }
+    public function testMethodCallMultiArgument()
+    {
+        $obj = ExpressionParser::Parse('fun(x,y,z)');
+
+        $this->assertInstanceOf(TEMethodCall::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->source);
+        $this->assertEquals("fun", $obj->source->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->args[0]);
+        $this->assertEquals("x", $obj->args[0]->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->args[1]);
+        $this->assertEquals("y", $obj->args[1]->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->args[2]);
+        $this->assertEquals("z", $obj->args[2]->name);
+    }
 
     public function testAdd()
     {
