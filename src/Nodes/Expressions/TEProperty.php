@@ -27,8 +27,10 @@ class TEProperty extends TEExpression
         } else {
             if (is_array($obj))
                 return $obj[$name];
-            else
+            else if(isset($obj->$name))
                 return $obj->$name;
+            else if(method_exists($obj, $name))
+                return fn(...$args) => $obj->$name(...$args);
         }
     }
 }
