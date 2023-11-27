@@ -13,6 +13,13 @@ abstract class TNode
         $result = $this->execute($env);
         return $env->document->saveHTML($result);
     }
+
+    public function executeToStringXML(Environment $env)
+    {
+        $result = $this->execute($env);
+        return $env->document->saveXML($result);
+    }
+
     public function addChild($child)
     {
         $this->children[] = $child;
