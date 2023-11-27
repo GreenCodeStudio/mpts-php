@@ -129,7 +129,7 @@ class ExpressionExecuteTest extends TestCase
         $env->variables['first'] = 3;
         $env->variables['second'] = 7;
         $env->variables['fun'] = fn($a,$b) => $a*$b;
-        $this->assertEquals(10, $obj->execute($env));
+        $this->assertEquals(21, $obj->execute($env));
     }
 
     public function testAdd()

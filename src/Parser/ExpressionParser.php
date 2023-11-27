@@ -57,12 +57,12 @@ class ExpressionParser extends AbstractParser
                     $lastNode = new TEMethodCall($lastNode);
                     $this->position++;
                     $this->skipWhitespace();
-                    while (strlen($this->text)<$this->position && $this->text[$this->position] != ')') {
+                    while ($this->position<=strlen($this->text) && $this->text[$this->position] != ')') {
                         if ($this->position >= strlen($this->text)) throw new \Exception("Unexpected end of input");
 
                         $value = $this->parseNormal(2);
                         $lastNode->args[] = $value;
-                        if($this->text[$this->position]??null ==',')
+                        if($this->position<=strlen($this->text) && $this->text[$this->position] ==',')
                             $this->position++;
                     }
                     $this->position++;
@@ -117,7 +117,7 @@ class ExpressionParser extends AbstractParser
                 if ($lastNode) {
                     break;
                 }
-                $name = $this->readUntill("/['\"\(\)=\.\s:>\/+\-*?]/");
+                $name = $this->readUntill("/['\"\(\)=\.\s:>\/+\-*?,]/");
                 if ($name == "true") {
                     $lastNode = new TEBoolean(true);
                 } else if ($name == "false") {
