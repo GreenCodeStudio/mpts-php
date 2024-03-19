@@ -10,21 +10,6 @@ permissions:
   contents: read
 
 jobs:
-  test74:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-
-      - name: Validate composer.json and composer.lock
-        run: composer validate --strict
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-      - name: Install dependencies
-        run: composer upgrade --prefer-dist --no-progress
-      - name: Run test suite
-        run: composer run-script test
   test80:
     runs-on: ubuntu-latest
     steps:
