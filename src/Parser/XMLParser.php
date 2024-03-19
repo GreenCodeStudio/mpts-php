@@ -16,6 +16,8 @@ use MKrawczyk\Mpts\Nodes\TText;
 
 class XMLParser extends AbstractParser
 {
+
+
     public function __construct(string $text)
     {
         $this->text = $text;

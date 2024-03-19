@@ -22,6 +22,9 @@ abstract class TNode
 
     public function addChild($child)
     {
-        $this->children[] = $child;
+        if (isset($this->children))
+            $this->children[] = $child;
+        else
+            throw new \Exception("This node does not support children");
     }
 }

@@ -3,7 +3,9 @@
 namespace MKrawczyk\Mpts\Parser;
 abstract class  AbstractParser
 {
-
+    protected string $text;
+    protected int $position;
+    protected array $openElements;
     protected function readUntill($regexp)
     {
         $ret = "";
