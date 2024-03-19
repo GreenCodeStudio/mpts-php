@@ -194,7 +194,7 @@ class XMLParser extends AbstractParser
         } else if (strtolower($result->element->tagName) == ":else-if") {
             $last = end($element->children);
             if (!($last instanceof TIf && $last->else == null))
-                throw new MptsParserError("need if before else-if");
+                $this->throw("need if before else-if");
 
             $expression = $result->element->getAttribute('condition')->expression;
             $last->conditions[] = (object)['expression' => $expression, 'children' => []];
@@ -204,7 +204,7 @@ class XMLParser extends AbstractParser
         } else if (strtolower($result->element->tagName) == ":else") {
             $last = end($element->children);
             if (!($last instanceof TIf && $last->else == null))
-                throw new MptsParserError("need if before else");
+                $this->throw("need if before else");
 
             $last->else = (object)['children' => []];
 
@@ -237,31 +237,31 @@ class XMLParser extends AbstractParser
             if ($last instanceof TIf && count($last->conditions) == 1 && $last->else == null) {
                 array_pop($this->openElements);
             } else {
-                throw new MptsParserError("Last opened element is not <:if>");
+                $this->throw("Last opened element is not <:if>");
             }
         } elseif ($tagName == ':else-if') {
             if ($last instanceof TIf && count($last->conditions) > 1 && $last->else == null) {
                 array_pop($this->openElements);
             } else {
-                throw new MptsParserError("Last opened element is not <:else-if>");
+                $this->throw("Last opened element is not <:else-if>");
             }
         } elseif ($tagName == ':else') {
             if ($last instanceof TIf && $last->else != null) {
                 array_pop($this->openElements);
             } else {
-                throw new MptsParserError("Last opened element is not <:else>");
+                $this->throw("Last opened element is not <:else>");
             }
         } elseif ($tagName == ':loop') {
             if ($last instanceof TLoop) {
                 array_pop($this->openElements);
             } else {
-                throw new MptsParserError("Last opened element is not <:loop>");
+                $this->throw("Last opened element is not <:loop>");
             }
         } elseif ($tagName == ':foreach') {
             if ($last instanceof TForeach) {
                 array_pop($this->openElements);
             } else {
-                throw new MptsParserError("Last opened element is not <:foreach>");
+                $this->throw("Last opened element is not <:foreach>");
             }
         }
     }
