@@ -3,6 +3,8 @@
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
+use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
+use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
 use MKrawczyk\Mpts\Nodes\TAttribute;
@@ -55,8 +57,9 @@ class XMLParserTest extends UniParserTest
         $this->assertEquals("0.01", $obj->children[0]->attributes[2]->expression->value);
         $this->assertInstanceOf(TAttribute::class, $obj->children[0]->attributes[3]);
         $this->assertEquals("value", $obj->children[0]->attributes[3]->name);
-        $this->assertInstanceOf(TEBoolean::class, $obj->children[0]->attributes[3]->expression);
-        $this->assertInstanceOf(TEVariable::class, $obj->children[0]->attributes[3]->expression->left);
+        $this->assertInstanceOf(TEOrNull::class, $obj->children[0]->attributes[3]->expression);
+        $this->assertInstanceOf(TEProperty::class, $obj->children[0]->attributes[3]->expression->left);
+        $this->assertInstanceOf(TEVariable::class, $obj->children[0]->attributes[3]->expression->left->source);
         $this->assertInstanceOf(TEMethodCall::class, $obj->children[0]->attributes[3]->expression->right);
         $this->assertInstanceOf(TEVariable::class, $obj->children[0]->attributes[3]->expression->right->source);
     }

@@ -2,6 +2,7 @@
 
 namespace MKrawczyk\Mpts\Parser;
 
+use MKrawczyk\FunQuery\FunQuery;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\TAttribute;
 use MKrawczyk\Mpts\Nodes\TComment;
@@ -23,12 +24,8 @@ class AbstractMLParser extends AbstractParser
         $this->openElements = [new TDocumentFragment()];
     }
 
-    public static function Parse(string $text)
-    {
-        return (new XMLParser($text))->parseNormal();
-    }
 
-    private function parseNormal()
+    protected function parseNormal()
     {
         while ($this->position < strlen($this->text)) {
             $char = $this->text[$this->position];
@@ -42,8 +39,7 @@ class AbstractMLParser extends AbstractParser
                     $node = new TExpressionSubnode();
                     $node->expression = $result;
                     $element->children[] = $node;
-                }
-                else if (substr($this->text, $this->position, 4) == '<!--') {
+                } else if (substr($this->text, $this->position, 4) == '<!--') {
                     $this->position += 4;
                     $text = $this->readUntillText('-->');
                     $this->position += 3;
@@ -56,6 +52,12 @@ class AbstractMLParser extends AbstractParser
                         $this->closeSpecialElement($name, $this->openElements);
                     } else if ($element instanceof TElement && $element->tagName == $name) {
                         array_pop($this->openElements);
+                    } else if ($this->allowAutoClose && FunQuery::from($this->openElements)->any(fn($x) => $x instanceof TElement && $x->tagName == $name)) {
+                        $reversed = array_reverse($this->openElements);
+                        $closingElement = FunQuery::from($reversed)->first(fn($x) => $x instanceof TElement && $x->tagName == $name);
+                        $indexOf = array_search($closingElement, $reversed);
+                        $reversed = array_slice($reversed, $indexOf + 1);
+                        $this->openElements = array_reverse($reversed);
                     } else {
                         $this->throw("Last opened element is not <$name>");
                     }
@@ -66,9 +68,7 @@ class AbstractMLParser extends AbstractParser
                     if (str_starts_with($result->element->tagName, ':')) {
                         $this->convertToSpecialElement($result, $element);
                     } else {
-                        $element->addChild($result->element);
-                        if (!$result->autoclose)
-                            $this->openElements[] = $result->element;
+                        $this->addElement($result->element, $result->autoclose);
                     }
                 }
             } else if ($char == "{" && $this->text[$this->position + 1] == "{") {
@@ -86,8 +86,8 @@ class AbstractMLParser extends AbstractParser
                 $this->position++;
             }
         }
-        if (count($this->openElements) > 1) {
-            $tagName=$this->openElements[count($this->openElements) - 1]->tagName;
+        if (count($this->openElements) > 1 && !$this->allowAutoClose) {
+            $tagName = $this->openElements[count($this->openElements) - 1]->tagName;
             $this->throw("Element <$tagName> not closed");
         }
         return $this->openElements[0];
