@@ -13,10 +13,12 @@ use MKrawczyk\Mpts\Nodes\TExpressionText;
 use MKrawczyk\Mpts\Nodes\TForeach;
 use MKrawczyk\Mpts\Nodes\TIf;
 use MKrawczyk\Mpts\Nodes\TLoop;
+use MKrawczyk\Mpts\Nodes\TNode;
 use MKrawczyk\Mpts\Nodes\TText;
 
 class AbstractMLParser extends AbstractParser
 {
+    protected bool $allowAutoClose;
     public function __construct(string $text)
     {
         $this->text = $text;
@@ -24,7 +26,7 @@ class AbstractMLParser extends AbstractParser
         $this->openElements = [new TDocumentFragment()];
     }
 
-
+    abstract protected function addElement(TNode $element, bool $autoclose=false);
     protected function parseNormal()
     {
         while ($this->position < strlen($this->text)) {
