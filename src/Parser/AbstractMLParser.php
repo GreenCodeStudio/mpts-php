@@ -16,7 +16,7 @@ use MKrawczyk\Mpts\Nodes\TLoop;
 use MKrawczyk\Mpts\Nodes\TNode;
 use MKrawczyk\Mpts\Nodes\TText;
 
-class AbstractMLParser extends AbstractParser
+abstract class AbstractMLParser extends AbstractParser
 {
     protected bool $allowAutoClose;
     public function __construct(string $text)
