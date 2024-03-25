@@ -3,6 +3,7 @@
 use MKrawczyk\Mpts\Environment;
 use MKrawczyk\Mpts\Nodes\Expressions\TEAdd;
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
+use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
@@ -134,6 +135,7 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEVariable::class, $obj->args[0]);
         $this->assertEquals("x", $obj->args[0]->name);
     }
+
     public function testMethodCallMultiArgument()
     {
         $obj = ExpressionParser::Parse('fun(x,y,z)');
@@ -149,16 +151,37 @@ class ExpressionParseTest extends TestCase
         $this->assertEquals("z", $obj->args[2]->name);
     }
 
-    public function testAdd()
+    public function testMethodCallString()
     {
-        $obj = ExpressionParser::Parse('a+b');
+        $obj = ExpressionParser::Parse('fun("x")');
 
-        $this->assertInstanceOf(TEAdd::class, $obj);
-        $this->assertInstanceOf(TEVariable::class, $obj->left);
-        $this->assertEquals("a", $obj->left->name);
-        $this->assertInstanceOf(TEVariable::class, $obj->right);
-        $this->assertEquals("b", $obj->right->name);
+        $this->assertInstanceOf(TEMethodCall::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->source);
+        $this->assertEquals("fun", $obj->source->name);
+        $this->assertInstanceOf(TEString::class, $obj->args[0]);
+        $this->assertEquals("x", $obj->args[0]->value);
     }
+
+    public function testConcatenation()
+    {
+        $obj = ExpressionParser::Parse('var1:var2');
+        $this->assertInstanceOf(TEConcatenate::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("var1", $obj->left->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->right);
+        $this->assertEquals("var2", $obj->right->name);
+    }
+
+    public function testConcatenationString()
+    {
+        $obj = ExpressionParser::Parse('"string1":var2');
+        $this->assertInstanceOf(TEConcatenate::class, $obj);
+        $this->assertInstanceOf(TEString::class, $obj->left);
+        $this->assertEquals("string1", $obj->left->value);
+        $this->assertInstanceOf(TEVariable::class, $obj->right);
+        $this->assertEquals("var2", $obj->right->name);
+    }
+
     public function testOrNull()
     {
         $obj = ExpressionParser::Parse('var1??"empty"');
@@ -169,6 +192,7 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEString::class, $obj->right);
         $this->assertEquals("empty", $obj->right->value);
     }
+
     public function testOrNullProperty()
     {
         $obj = ExpressionParser::Parse('var1.property??"empty"');
@@ -181,6 +205,7 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEString::class, $obj->right);
         $this->assertEquals("empty", $obj->right->value);
     }
+
     public function testFunctionCall()
     {
         $obj = ExpressionParser::Parse('fun1(param)');
@@ -191,6 +216,7 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEVariable::class, $obj->args[0]);
         $this->assertEquals("param", $obj->args[0]->name);
     }
+
     public function testFunctionCall2()
     {
         $obj = ExpressionParser::Parse('getView("User", "PermissionsEdit", data)');
@@ -205,4 +231,16 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEVariable::class, $obj->args[2]);
         $this->assertEquals("data", $obj->args[2]->name);
     }
+
+    public function testAdd()
+    {
+        $obj = ExpressionParser::Parse('a+b');
+
+        $this->assertInstanceOf(TEAdd::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("a", $obj->left->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->right);
+        $this->assertEquals("b", $obj->right->name);
+    }
+
 }
