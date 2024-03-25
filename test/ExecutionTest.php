@@ -82,7 +82,6 @@ class ExecutionTest extends TestCase
         $this->assertEquals("<div>ABC</div>", $this->fragmentToHtml($result));
     }
 
-
     public function testElementWithAttributes()
     {
         $obj = XMLParser::Parse("<div a=\"1\" b='2' c=3 d=d e=(e)></div>");

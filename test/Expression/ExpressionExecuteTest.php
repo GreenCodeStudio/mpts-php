@@ -87,7 +87,12 @@ class ExpressionExecuteTest extends TestCase
         $env = new Environment();
         $this->assertEquals('text', $obj->execute($env));
     }
+    public function testStringConcat(){
+        $obj = ExpressionParser::Parse('"te":\'xt\'');
 
+        $env = new Environment();
+        $this->assertEquals('text', $obj->execute($env));
+    }
     public function testEqual()
     {
         $obj = ExpressionParser::Parse('a==b');
