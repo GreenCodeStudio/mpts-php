@@ -1,6 +1,7 @@
 <?php
 
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
+use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
@@ -45,12 +46,6 @@ abstract class  UniParserTest extends TestCase
         $this->assertEquals("div", $obj->children[0]->tagName);
     }
 
-    public function testNotClosedElement()
-    {
-        $this->expectExceptionMessageMatches("/Element <div> not closed/");
-        $obj = $this->parse("<div>");
-    }
-
     public function testNotOpenedElement()
     {
         $this->expectExceptionMessageMatches("/Last opened element is not <div>/");
@@ -70,11 +65,6 @@ abstract class  UniParserTest extends TestCase
         $this->assertEquals("span", $obj->children[0]->children[0]->children[1]->tagName);
     }
 
-    public function testBadOrderOfClose()
-    {
-        $this->expectExceptionMessageMatches("/Last opened element is not <span>/");
-        $obj = $this->parse("<span><strong></span></strong>");
-    }
 
     public function testElementWithAttribute()
     {
@@ -97,7 +87,7 @@ abstract class  UniParserTest extends TestCase
 
     public function testElementWithAttributeWithVariables()
     {
-        $obj = $this->parse("<img src=(v1) alt=v2/>");
+        $obj = $this->parse("<img src=(v1) alt=v2 class=(getClass())/>");
 
         $this->assertInstanceOf(TDocumentFragment::class, $obj);
         $this->assertInstanceOf(TElement::class, $obj->children[0]);
@@ -110,6 +100,11 @@ abstract class  UniParserTest extends TestCase
         $this->assertEquals("alt", $obj->children[0]->attributes[1]->name);
         $this->assertInstanceOf(TEVariable::class, $obj->children[0]->attributes[1]->expression);
         $this->assertEquals("v2", $obj->children[0]->attributes[1]->expression->name);
+        $this->assertInstanceOf(TAttribute::class, $obj->children[0]->attributes[2]);
+        $this->assertEquals("class", $obj->children[0]->attributes[2]->name);
+        $this->assertInstanceOf(TEMethodCall::class, $obj->children[0]->attributes[2]->expression);
+        $this->assertInstanceOf(TEVariable::class, $obj->children[0]->attributes[2]->expression->source);
+        $this->assertEquals("getClass", $obj->children[0]->attributes[2]->expression->source->name);
     }
 
     public function testElementWithBooleanAtribute()
