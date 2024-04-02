@@ -17,8 +17,12 @@ class TElement extends TNode
         foreach ($this->attributes as $attr) {
             if ($attr->expression == null)
                 $ret->setAttribute($attr->name, $attr->name);
-            else
-                $ret->setAttribute($attr->name, $attr->expression->execute($env));
+            else {
+                $value=$attr->expression->execute($env);
+                if($value!==null && $value!==false) {
+                    $ret->setAttribute($attr->name, $value);
+                }
+            }
         }
         foreach ($this->children as $child) {
             $result = $child->execute($env);
