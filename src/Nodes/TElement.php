@@ -10,6 +10,7 @@ class TElement extends TNode
     public string $tagName = "";
     public array $children = [];
     public array $attributes = [];
+    public int $parsePosition = 0;
 
     public function execute(Environment $env): \DOMElement
     {
