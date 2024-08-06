@@ -27,8 +27,14 @@ class TElement extends TNode
         }
         foreach ($this->children as $child) {
             $result = $child->execute($env);
-            if (!empty($result))
+            if (!empty($result)) {
+                if($result instanceof \DOMDocumentFragment){
+                    if($result->childNodes->length==0){
+                        continue;
+                    }
+                }
                 $ret->appendChild($result);
+            }
         }
         return $ret;
     }
