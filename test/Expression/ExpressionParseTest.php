@@ -95,6 +95,13 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEString::class, $obj);
         $this->assertEquals("text", $obj->value);
     }
+    public function testString3()
+    {
+        $obj = ExpressionParser::Parse('"&#x63;&#100;"');
+
+        $this->assertInstanceOf(TEString::class, $obj);
+        $this->assertEquals("cd", $obj->value);
+    }
 
     public function testEqual()
     {

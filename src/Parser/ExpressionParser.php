@@ -46,11 +46,11 @@ class ExpressionParser extends AbstractParser
                 $lastNode = new TENumber((float)$value);
             } else if ($char == '"') {
                 $this->position++;
-                $lastNode = new TEString($this->readUntill('/"/'));
+                $lastNode = new TEString($this->decodeEntities($this->readUntill('/"/')));
                 $this->position++;
             } else if ($char == "'") {
                 $this->position++;
-                $lastNode = new TEString($this->readUntill("/'/"));
+                $lastNode = new TEString($this->decodeEntities($this->readUntill("/'/")));
                 $this->position++;
             } else if ($char == "(") {
                 if ($lastNode) {
@@ -130,5 +130,10 @@ class ExpressionParser extends AbstractParser
             }
         }
         return $lastNode;
+    }
+
+    private function decodeEntities(string $raw)
+    {
+        return html_entity_decode($raw, ENT_QUOTES|ENT_HTML5);
     }
 }

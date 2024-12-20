@@ -191,4 +191,13 @@ class ExecutionTest extends TestCase
         $this->assertEquals("<input disabled><input>", $this->fragmentToHtml($result));
 
     }
+    public function testEntities()
+    {
+        $obj = XMLParser::Parse("<div class=\"&quot;&amp;&lt;&gt;&apos;\">&#x61;&#98;</div>");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $result = $obj->execute($env);
+        $this->assertEquals($result->firstChild->getAttribute('class'), "\"&<>'");
+        $this->assertEquals($result->textContent, "ab");
+    }
 }
