@@ -200,4 +200,12 @@ class ExecutionTest extends TestCase
         $this->assertEquals($result->firstChild->getAttribute('class'), "\"&<>'");
         $this->assertEquals($result->textContent, "ab");
     }
+
+    public function testXmlDeclartation()
+    {
+        $obj = XMLParser::Parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><root/>");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $result = $obj->execute($env);
+    }
 }

@@ -87,12 +87,15 @@ class ExpressionExecuteTest extends TestCase
         $env = new Environment();
         $this->assertEquals('text', $obj->execute($env));
     }
-    public function testStringConcat(){
+
+    public function testStringConcat()
+    {
         $obj = ExpressionParser::Parse('"te":\'xt\'');
 
         $env = new Environment();
         $this->assertEquals('text', $obj->execute($env));
     }
+
     public function testEqual()
     {
         $obj = ExpressionParser::Parse('a==b');
@@ -126,6 +129,7 @@ class ExpressionExecuteTest extends TestCase
         $env->variables['fun'] = fn($z) => $z * 10;
         $this->assertEquals(10, $obj->execute($env));
     }
+
     public function testMethodCallMultiple()
     {
         $obj = ExpressionParser::Parse('fun(first,second)');
@@ -133,7 +137,7 @@ class ExpressionExecuteTest extends TestCase
         $env = new Environment();
         $env->variables['first'] = 3;
         $env->variables['second'] = 7;
-        $env->variables['fun'] = fn($a,$b) => $a*$b;
+        $env->variables['fun'] = fn($a, $b) => $a * $b;
         $this->assertEquals(21, $obj->execute($env));
     }
 
@@ -144,6 +148,7 @@ class ExpressionExecuteTest extends TestCase
         $env = new Environment();
         $this->assertEquals(10, $obj->execute($env));
     }
+
     public function testSub()
     {
         $obj = ExpressionParser::Parse("2-5 - 3");
@@ -151,7 +156,49 @@ class ExpressionExecuteTest extends TestCase
         $env = new Environment();
         $this->assertEquals(-6, $obj->execute($env));
     }
-    public function testOrNull(){
+
+
+    public function testMultiply()
+    {
+        $obj = ExpressionParser::Parse("2*5 * 3");
+
+        $env = new Environment();
+        $this->assertEquals(30, $obj->execute($env));
+    }
+
+    public function testDivide()
+    {
+        $obj = ExpressionParser::Parse("20/5 / 2");
+        $env = new Environment();
+        $this->assertEquals(2, $obj->execute($env));
+    }
+
+    public function testPrecedence()
+    {
+        $obj = ExpressionParser::Parse("2+5 * 3");
+
+        $env = new Environment();
+        $this->assertEquals(17, $obj->execute($env));
+    }
+
+    public function testParenthesis()
+    {
+        $obj = ExpressionParser::Parse("(2+5) * 3");
+
+        $env = new Environment();
+        $this->assertEquals(21, $obj->execute($env));
+    }
+
+    public function testModulo()
+    {
+        $obj = ExpressionParser::Parse("20 % 6");
+
+        $env = new Environment();
+        $this->assertEquals(2, $obj->execute($env));
+    }
+
+    public function testOrNull()
+    {
         $obj = ExpressionParser::Parse('var1??"empty"');
 
         $env = new Environment();
@@ -161,7 +208,9 @@ class ExpressionExecuteTest extends TestCase
         $env->variables['var1'] = "val";
         $this->assertEquals("val", $obj->execute($env));
     }
-    public function testOrNullProperty(){
+
+    public function testOrNullProperty()
+    {
         $obj = ExpressionParser::Parse('var1.property??"empty"');
 
         $env = new Environment();
@@ -176,7 +225,6 @@ class ExpressionExecuteTest extends TestCase
         $this->assertEquals("val", $obj->execute($env));
 
 
-
         $env->variables['var1'] = (object)[];
         $this->assertEquals("empty", $obj->execute($env));
         $env->variables['var1'] = (object)['property' => null];
@@ -184,4 +232,63 @@ class ExpressionExecuteTest extends TestCase
         $env->variables['var1'] = (object)['property' => 'val'];
         $this->assertEquals("val", $obj->execute($env));
     }
+
+    public function testAnd()
+    {
+        $obj = ExpressionParser::Parse("a && b");
+        $env = new Environment();
+        $env->variables['a'] = true;
+        $env->variables['b'] = false;
+        $this->assertEquals(false, $obj->execute($env));
+        $env->variables['b'] = true;
+        $this->assertEquals(true, $obj->execute($env));
+    }
+
+    public function testOr()
+    {
+        $obj = ExpressionParser::Parse("a || b");
+        $env = new Environment();
+        $env->variables['a'] = false;
+        $env->variables['b'] = false;
+        $this->assertEquals(false, $obj->execute($env));
+        $env->variables['b'] = true;
+        $this->assertEquals(true, $obj->execute($env));
+    }
+
+    public function testNot()
+    {
+        $obj = ExpressionParser::Parse("!a");
+        $env = new Environment();
+        $env->variables['a'] = false;
+        $this->assertEquals(true, $obj->execute($env));
+        $env->variables['a'] = true;
+        $this->assertEquals(false, $obj->execute($env));
+
+
+    }
+
+    public function testDoubleNot()
+    {
+        $obj = ExpressionParser::Parse("!!a");
+        $env = new Environment();
+        $env->variables['a'] = false;
+        $this->assertEquals(false, $obj->execute($env));
+        $env->variables['a'] = true;
+        $this->assertEquals(true, $obj->execute($env));
+        $env->variables['a'] = 'text';
+        $this->assertEquals(true, $obj->execute($env));
+        $env->variables['a'] = '';
+        $this->assertEquals(false, $obj->execute($env));
+        $env->variables['a'] = 'false';
+        $this->assertEquals(false, $obj->execute($env));
+        $env->variables['a'] = 'faLsE';
+        $this->assertEquals(false, $obj->execute($env));
+        $env->variables['a'] = 0;
+        $this->assertEquals(false, $obj->execute($env));
+        $env->variables['a'] = 1;
+        $this->assertEquals(true, $obj->execute($env));
+
+
+    }
+
 }
