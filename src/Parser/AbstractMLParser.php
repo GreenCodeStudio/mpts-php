@@ -19,14 +19,17 @@ use MKrawczyk\Mpts\Nodes\TText;
 abstract class AbstractMLParser extends AbstractParser
 {
     protected bool $allowAutoClose;
-    public function __construct(string $text)
+
+    public function __construct(string $text, ?string $fileName = null)
     {
         $this->text = $text;
         $this->position = 0;
         $this->openElements = [new TDocumentFragment()];
+        $this->fileName = $fileName;
     }
 
-    abstract protected function addElement(TNode $element, bool $autoclose=false);
+    abstract protected function addElement(TNode $element, bool $autoclose = false);
+
     protected function parseNormal()
     {
         while ($this->position < strlen($this->text)) {
@@ -60,6 +63,8 @@ abstract class AbstractMLParser extends AbstractParser
                         $indexOf = array_search($closingElement, $reversed);
                         $reversed = array_slice($reversed, $indexOf + 1);
                         $this->openElements = array_reverse($reversed);
+                    } else if ($element instanceof TElement) {
+                        $this->throw("Last opened element is not <$name> but <$element->tagName>");
                     } else {
                         $this->throw("Last opened element is not <$name>");
                     }

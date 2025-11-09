@@ -13,7 +13,13 @@ class XMLParser extends AbstractMLParser
 
     public static function Parse(string $text)
     {
-        return (new XMLParser($text))->parseNormal();
+        return (new self($text))->parseNormal();
+    }
+
+    public static function ParseFile(string $filePath)
+    {
+        $fullPath = realpath($filePath);
+        return (new self(file_get_contents($filePath), $fullPath))->parseNormal();
     }
 
     protected function addElement(TNode $element, bool $selfclose = false)

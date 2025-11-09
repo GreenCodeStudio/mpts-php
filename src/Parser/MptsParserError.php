@@ -9,9 +9,9 @@ class MptsParserError extends \Exception
     public int $column;
     public string $sample;
 
-    public function __construct(string $message, int $line, int $column, string $sample)
+    public function __construct(string $message, int $line, int $column, string $sample, ?string $fileName = null)
     {
-        parent::__construct($message . "\r\n" . preg_replace("/\n/", '\\n', $sample) . "\r\n" . $line . ":" . $column);
+        parent::__construct($message."\r\n".preg_replace("/\n/", '\\n', $sample)."\r\n".($fileName??'unknownFile').":".$line.":".$column);
 
         $this->messageRaw = $message;
         $this->lineRaw = $line;

@@ -15,10 +15,17 @@ class HTMLParser extends AbstractMLParser
     {
         return (new HTMLParser($text))->parseNormal();
     }
-    protected function addElement(TNode $element, bool $autoclose=false)
+
+    public static function ParseFile(string $filePath)
+    {
+        $fullPath = realpath($filePath);
+        return (new self(file_get_contents($filePath), $fullPath))->parseNormal();
+    }
+
+    protected function addElement(TNode $element, bool $autoclose = false)
     {
         $parent = $this->openElements[count($this->openElements) - 1];
-        if ($parent instanceof TElement && in_array(strtolower($element->tagName), $this->onlySiblingsElements) && strtolower($parent->tagName) === strtolower($element->tagName)){
+        if ($parent instanceof TElement && in_array(strtolower($element->tagName), $this->onlySiblingsElements) && strtolower($parent->tagName) === strtolower($element->tagName)) {
             array_pop($this->openElements);
             $parent = $this->openElements[count($this->openElements) - 1];
         }

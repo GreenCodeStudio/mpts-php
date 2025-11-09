@@ -19,9 +19,13 @@ class ExpressionParser extends AbstractParser
     public string $text;
     public int $position = 0;
 
-    public function __construct(string $text)
+    public function __construct(string $text, ?string $fileName = null, ?int $filePositionOffset = null, ?int $fileLineOffset = null, ?int $fileColumnOffset = null)
     {
         $this->text = $text;
+        $this->filePositionOffset= $filePositionOffset;
+        $this->fileLineOffset= $fileLineOffset;
+        $this->fileColumnOffset= $fileColumnOffset;
+        $this->fileName = $fileName;
     }
 
     public static function Parse(string $text)

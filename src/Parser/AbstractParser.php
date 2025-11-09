@@ -4,8 +4,13 @@ namespace MKrawczyk\Mpts\Parser;
 abstract class  AbstractParser
 {
     protected string $text;
+    protected ?string $fileName = null;
+    protected ?int $fileLineOffset = null;
+    protected ?int $fileColumnOffset = null;
+    protected ?int $filePositionOffset = null;
     protected int $position;
     protected array $openElements;
+
     protected function readUntill($regexp)
     {
         $ret = "";
@@ -36,6 +41,7 @@ abstract class  AbstractParser
         }
         return $ret;
     }
+
     protected function throw($message)
     {
         $lines = explode("\n", substr($this->text, 0, $this->position));
