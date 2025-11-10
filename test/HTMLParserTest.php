@@ -72,4 +72,31 @@ class HTMLParserTest extends UniParserTest
         $this->assertEquals("li", $obj->children[0]->children[2]->tagName);
         $this->assertEquals("three", $obj->children[0]->children[2]->children[0]->text);
     }
+
+    public function testLiEndTagOmission()
+    {
+        // Test that li end tags can be omitted when followed by another li
+        $obj = $this->parse("<ul><li>one<li>two<li>three</ul>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $this->assertEquals("ul", $obj->children[0]->tagName);
+        $this->assertCount(3, $obj->children[0]->children);
+        
+        // Check each li element
+        $this->assertEquals("li", $obj->children[0]->children[0]->tagName);
+        $this->assertEquals("one", $obj->children[0]->children[0]->children[0]->text);
+        $this->assertEquals("li", $obj->children[0]->children[1]->tagName);
+        $this->assertEquals("two", $obj->children[0]->children[1]->children[0]->text);
+        $this->assertEquals("li", $obj->children[0]->children[2]->tagName);
+        $this->assertEquals("three", $obj->children[0]->children[2]->children[0]->text);
+        
+        // Test that li end tags can be omitted when there's no more content in the parent
+        $obj = $this->parse("<ul><li>single item</ul>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $this->assertEquals("ul", $obj->children[0]->tagName);
+        $this->assertCount(1, $obj->children[0]->children);
+        $this->assertEquals("li", $obj->children[0]->children[0]->tagName);
+        $this->assertEquals("single item", $obj->children[0]->children[0]->children[0]->text);
+    }
 }
