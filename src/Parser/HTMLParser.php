@@ -11,9 +11,9 @@ class HTMLParser extends AbstractMLParser
     protected array $onlySiblingsElements = ['li', 'dt', 'dd', 'p', 'rt', 'rp', 'optgroup', 'option', 'colgroup', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th'];
     protected bool $allowAutoClose = true;
 
-    public static function Parse(string $text)
+    public static function Parse(string $text, ?string $filePath = null)
     {
-        return (new HTMLParser($text))->parseNormal();
+        return (new HTMLParser($text, $filePath))->parseNormal();
     }
 
     public static function ParseFile(string $filePath)

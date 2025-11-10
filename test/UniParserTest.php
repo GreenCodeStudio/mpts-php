@@ -48,7 +48,12 @@ abstract class  UniParserTest extends TestCase
 
     public function testNotOpenedElement()
     {
-        $this->expectExceptionMessageMatches("/Last opened element is not <div>/");
+        $this->expectExceptionMessageMatches("/Last opened element is not <div> but <section>/");
+        $obj = $this->parse("<section></div>");
+    }
+    public function testNotOpenedElement2()
+    {
+        $this->expectExceptionMessageMatches("/There is no opened elements, <div> closed/");
         $obj = $this->parse("</div>");
     }
 
@@ -106,6 +111,12 @@ abstract class  UniParserTest extends TestCase
         $this->assertInstanceOf(TEVariable::class, $obj->children[0]->attributes[2]->expression->source);
         $this->assertEquals("getClass", $obj->children[0]->attributes[2]->expression->source->name);
     }
+    public function testElementWithSyntaxErrorInAttribute()
+    {
+        $this->expectExceptionMessageMatches("/source object expected before dot/");
+        $this->expectExceptionMessageMatches("/file\.mpts:1:9");
+        $this->parse("<img src=.value/>", "file.mpts");
+    }
 
     public function testElementWithBooleanAtribute()
     {
@@ -147,6 +158,29 @@ abstract class  UniParserTest extends TestCase
         $this->assertInstanceOf(TIf::class, $obj->children[0]);
         $this->assertInstanceOf(TEBoolean::class, $obj->children[0]->conditions[0]->expression);
         $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[0]->children[0]);
+        $this->assertInstanceOf(TText::class, $obj->children[0]->else->children[0]);
+    }
+    public function testElseIf(){
+        $whitespace=" \t\n\r";
+        $obj = $this->parse("<:if condition=false>text</:if>".$whitespace."<:else-if condition=false>text</:else-if>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TIf::class, $obj->children[0]);
+        $this->assertInstanceOf(TEBoolean::class, $obj->children[0]->conditions[0]->expression);
+        $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[0]->children[0]);
+        $this->assertInstanceOf(TEBoolean::class, $obj->children[0]->conditions[1]->expression);
+        $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[1]->children[0]);
+        $this->assertNull($obj->children[0]->else);
+    }
+    public function testElseIfElse()
+    {
+        $whitespace=" \t\n\r";
+        $obj = $this->parse("<:if condition=false>text</:if>".$whitespace."<:else-if condition=false>text</:else-if><:else>text</:else>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TIf::class, $obj->children[0]);
+        $this->assertInstanceOf(TEBoolean::class, $obj->children[0]->conditions[0]->expression);
+        $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[0]->children[0]);
+        $this->assertInstanceOf(TEBoolean::class, $obj->children[0]->conditions[1]->expression);
+        $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[1]->children[0]);
         $this->assertInstanceOf(TText::class, $obj->children[0]->else->children[0]);
     }
 
@@ -197,6 +231,36 @@ abstract class  UniParserTest extends TestCase
         $this->assertInstanceOf(TForeach::class, $obj->children[0]->children[0]);
     }
 
+    public function testComplexExpressionInAttribute()
+    {
+        $obj = $this->parse('<div data-value=(a + b * c)></div>');
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $this->assertInstanceOf(TAttribute::class, $obj->children[0]->attributes[0]);
+        $attr = $obj->children[0]->attributes[0];
+        $this->assertEquals("data-value", $attr->name);
+    }
+    public function testNestedLoops()
+    {
+        $obj = $this->parse('<:loop count=2><:loop count=3>test</:loop></:loop>');
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TLoop::class, $obj->children[0]);
+        $this->assertInstanceOf(TLoop::class, $obj->children[0]->children[0]);
+        $this->assertInstanceOf(TText::class, $obj->children[0]->children[0]->children[0]);
+        $this->assertEquals(2, $obj->children[0]->count->value);
+        $this->assertEquals(3, $obj->children[0]->children[0]->count->value);
+    }
+
+
+    public function testNextedConditions()
+    {
+        $obj = $this->parse('<:if condition=true><:if condition=false>test</:if></:if>');
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TIf::class, $obj->children[0]);
+        $this->assertInstanceOf(TIf::class, $obj->children[0]->conditions[0]->children[0]);
+        $this->assertEquals(true, $obj->children[0]->conditions[0]->expression->value);
+        $this->assertEquals(false, $obj->children[0]->conditions[0]->children[0]->conditions[0]->expression->value);
+    }
     public function testCommentAfterElement()
     {
         $obj = $this->parse("<tr data-amount=article.amount><!--comment--></tr>");
@@ -204,5 +268,38 @@ abstract class  UniParserTest extends TestCase
         $this->assertInstanceOf(TDocumentFragment::class, $obj);
         $this->assertInstanceOf(TElement::class, $obj->children[0]);
         $this->assertInstanceOf(TComment::class, $obj->children[0]->children[0]);
+    }
+    public function testCommentWithSpecialCharacters()
+    {
+        $obj = $this->parse("<!-- comment with < > & \" ' -->");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TComment::class, $obj->children[0]);
+        $this->assertEquals(" comment with < > & \" ' ", $obj->children[0]->text);
+    }
+    public function testAttributeWithSingleQuotes()
+    {
+        $obj = $this->parse("<div attr='value'></div>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $attr = $obj->children[0]->attributes[0];
+        $this->assertInstanceOf(TAttribute::class, $attr);
+        $this->assertEquals("attr", $attr->name);
+        $this->assertInstanceOf(TEString::class, $attr->expression);
+        $this->assertEquals("value", $attr->expression->value);
+    }
+
+    public function testDTDHtml5()
+    {
+        $obj = $this->parse("<!DOCTYPE html>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(\MKrawczyk\Mpts\Nodes\TDocumentType::class, $obj->children[0]);
+        $this->assertEquals("html", $obj->children[0]->text);
+    }
+    public function testDTDCustom()
+    {
+        $obj = $this->parse("<!DOCTYPE PUBLIC SYSTEM \"file.dtd\">");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(\MKrawczyk\Mpts\Nodes\TDocumentType::class, $obj->children[0]);
+        $this->assertEquals('PUBLIC SYSTEM "file.dtd"', $obj->children[0]->text);
     }
 }

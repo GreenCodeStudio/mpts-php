@@ -22,25 +22,28 @@ include_once 'UniParserTest.php';
 
 class XMLParserTest extends UniParserTest
 {
-    protected function parse(string $input): TDocumentFragment
+    protected function parse(string $input, ?string $filePath = null): TDocumentFragment
     {
-        return XMLParser::Parse($input);
+        return XMLParser::Parse($input, $filePath);
     }
 
     public function testNotClosedElement()
     {
         $this->expectExceptionMessageMatches("/Element <div> not closed/");
-        $obj = $this->parse("<div>");
+        $this->expectExceptionMessageMatches("/file\.mpts:1:5/");
+        $obj = $this->parse("<div>", "file.mpts");
     }
 
     public function testBadOrderOfClose()
     {
-        $this->expectExceptionMessageMatches("/Last opened element is not <span>/");
-        $obj = $this->parse("<span><strong></span></strong>");
+        $this->expectExceptionMessageMatches("/Last opened element is not <span> but <strong>/");
+        $this->expectExceptionMessageMatches("/file\.mpts:1:14/");
+        $obj = $this->parse("<span><strong></span></strong>", "file.mpts");
     }
 
-    public function testRealLife1(){
-        $obj= $this->parse("<input name=\"realizationTime\" type=\"number\" step=\"0.01\" value=(data.realizationTime??t('roomsList.sumPrice.realizationTime.value')) />");
+    public function testRealLife1()
+    {
+        $obj = $this->parse("<input name=\"realizationTime\" type=\"number\" step=\"0.01\" value=(data.realizationTime??t('roomsList.sumPrice.realizationTime.value')) />");
         $this->assertInstanceOf(TDocumentFragment::class, $obj);
         $this->assertInstanceOf(TElement::class, $obj->children[0]);
         $this->assertInstanceOf(TAttribute::class, $obj->children[0]->attributes[0]);
@@ -62,5 +65,14 @@ class XMLParserTest extends UniParserTest
         $this->assertInstanceOf(TEVariable::class, $obj->children[0]->attributes[3]->expression->left->source);
         $this->assertInstanceOf(TEMethodCall::class, $obj->children[0]->attributes[3]->expression->right);
         $this->assertInstanceOf(TEVariable::class, $obj->children[0]->attributes[3]->expression->right->source);
+    }
+
+    public function testIgnoreXmlDeclaration()
+    {
+        $obj = $this->parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><div></div>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertCount(1, $obj->children);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $this->assertEquals("div", $obj->children[0]->tagName);
     }
 }
