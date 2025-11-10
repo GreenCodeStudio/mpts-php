@@ -11,6 +11,6 @@ class TExpressionText extends TNode
 
     public function execute(Environment $env):\DOMText
     {
-        return $env->document->createTextNode($this->expression->execute($env));
+        return $env->document->createTextNode(print_r($this->expression->execute($env),1));
     }
 }
