@@ -25,8 +25,8 @@ class HTMLParserTest extends UniParserTest
 
     public function testBadOrderOfClose()
     {
-        $this->expectExceptionMessageMatches("/There is no opened elements, <strong> closed/");
-        $this->expectExceptionMessageMatches("/file.mpts:0:21/");
+        $this->expectExceptionMessageMatches("/There is no opened element, <strong> closed/");
+        $this->expectExceptionMessageMatches("/file.mpts:1:21/");
         $obj = $this->parse("<span><strong></span></strong>", "file.mpts");
     }
 

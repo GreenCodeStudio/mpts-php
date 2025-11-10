@@ -53,7 +53,7 @@ abstract class  UniParserTest extends TestCase
     }
     public function testNotOpenedElement2()
     {
-        $this->expectExceptionMessageMatches("/There is no opened elements, <div> closed/");
+        $this->expectExceptionMessageMatches("/There is no opened element, <div> closed/");
         $obj = $this->parse("</div>");
     }
 

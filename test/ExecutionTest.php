@@ -182,7 +182,9 @@ class ExecutionTest extends TestCase
         $result = $obj->execute($env);
         $this->assertEquals("<div ab=\"cdefgh\"></div>", $this->fragmentToHtml($result));
     }
-    public function testDisabled(){
+
+    public function testDisabled()
+    {
         $obj = XMLParser::Parse("<input disabled=(a==1) /><input disabled=(a==2) />");
         $env = new Environment();
         $env->document = new DOMDocument();
@@ -191,6 +193,7 @@ class ExecutionTest extends TestCase
         $this->assertEquals("<input disabled><input>", $this->fragmentToHtml($result));
 
     }
+
     public function testEntities()
     {
         $obj = XMLParser::Parse("<div class=\"&quot;&amp;&lt;&gt;&apos;\">&#x61;&#98;</div>");
@@ -201,11 +204,12 @@ class ExecutionTest extends TestCase
         $this->assertEquals($result->textContent, "ab");
     }
 
-    public function testXmlDeclartation()
+    public function testXmlDeclaration()
     {
         $obj = XMLParser::Parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><root/>");
         $env = new Environment();
         $env->document = new DOMDocument();
         $result = $obj->execute($env);
+        $this->assertEmpty($result->children);
     }
 }
