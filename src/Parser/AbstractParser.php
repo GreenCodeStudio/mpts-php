@@ -45,7 +45,23 @@ abstract class  AbstractParser
     protected function throw($message)
     {
         $lines = explode("\n", substr($this->text, 0, $this->position));
-        throw new MptsParserError($message, count($lines), strlen($lines[count($lines) - 1]), substr($this->text, $this->position, 10));
+        throw new MptsParserError($message, $this->currentLineOffset(), $this->currentColumnOffset(), substr($this->text, $this->position, 10));
+    }
+    public function currentLineOffset()
+    {
+        return substr_count(substr($this->text, 0, $this->position), "\n") + $this->fileLineOffset ?? 0;
     }
 
+    public function currentColumnOffset()
+    {
+        $lines = explode("\n", substr($this->text, 0, $this->position));
+        $lineNumber = count($lines) - 1;
+        $startLine = strlen($lines[$lineNumber]);
+        return $startLine + ($lineNumber == 0 ? ($this->fileColumnOffset ?? 0) : 0);
+    }
+
+    public function currentFilePosition()
+    {
+        return $this->position+($this->filePositionOffset ?? 0);
+    }
 }

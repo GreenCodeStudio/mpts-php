@@ -5,8 +5,11 @@ namespace MKrawczyk\Mpts\Parser;
 use MKrawczyk\Mpts\Nodes\Expressions\TEAdd;
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
+use MKrawczyk\Mpts\Nodes\Expressions\TEDivide;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
+use MKrawczyk\Mpts\Nodes\Expressions\TEMultiply;
+use MKrawczyk\Mpts\Nodes\Expressions\TENegate;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
@@ -62,7 +65,7 @@ class ExpressionParser extends AbstractParser
                     $this->position++;
                     $this->skipWhitespace();
                     while ($this->position<strlen($this->text) && $this->text[$this->position] != ')') {
-                        if ($this->position >= strlen($this->text)) throw new \Exception("Unexpected end of input");
+                        if ($this->position >= strlen($this->text)) $this->throw("Unexpected end of input");
 
                         $value = $this->parseNormal(2);
                         $lastNode->args[] = $value;
@@ -80,7 +83,7 @@ class ExpressionParser extends AbstractParser
                 if ($endLevel >= 1) {
                     break;
                 } else {
-                    throw new \Exception("( not opened");
+                    $this->throw("( not opened");
                 }
             } else if ($char == '=' && $this->text[$this->position + 1] == "=") {
                 $this->position += 2;
@@ -107,6 +110,30 @@ class ExpressionParser extends AbstractParser
                 $this->position += 1;
                 $right = $this->parseNormal(4);
                 $lastNode = new TESubtract($lastNode, $right);
+            }else if ($char == '*') {
+                if ($endLevel >= 5) {
+                    break;
+                }
+                $this->position += 1;
+                $right = $this->parseNormal(5);
+                $lastNode = new TEMultiply($lastNode, $right);
+            } else if ($char == '/' && $this->text[$this->position + 1] != '>') {
+                if ($endLevel >= 5) {
+                    break;
+                }
+                $this->position += 1;
+                $right = $this->parseNormal(5);
+                $lastNode = new TEDivide($lastNode, $right);
+            } else if ($char == '!') {
+                if ($endLevel > 6) {
+                    break;
+                }
+                if($lastNode){
+                    $this->throw("unexpected '!'");
+                }
+                $this->position += 1;
+                $right = $this->parseNormal(6);
+                $lastNode = new TENegate($right);
             } else if ($char == ':') {
                 $this->position += 1;
                 $right = $this->parseNormal(3);
@@ -115,7 +142,7 @@ class ExpressionParser extends AbstractParser
                 if ($lastNode) {
                     break;
                 } else {
-                    throw new \Exception("Unexpected character");
+                    $this->throw("Unexpected character");
                 }
             } else {
                 if ($lastNode) {
@@ -127,7 +154,7 @@ class ExpressionParser extends AbstractParser
                 } else if ($name == "false") {
                     $lastNode = new TEBoolean(false);
                 } else if ($name == '') {
-                    throw new \Exception("Empty variable name");
+                    $this->throw("Empty variable name");
                 } else {
                     $lastNode = new TEVariable($name);
                 }

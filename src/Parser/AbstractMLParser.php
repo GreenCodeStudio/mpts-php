@@ -49,8 +49,14 @@ abstract class AbstractMLParser extends AbstractParser
                     $text = $this->readUntillText('-->');
                     $this->position += 3;
                     $element->children[] = new TComment($text);
+                } else if (substr($this->text, $this->position, 5) == '<?xml') {
+                    $this->position += 5;
+                    $text = $this->readUntillText('?>');
+                    $this->position += 2;
+                    //ignore xml declaration
                 } else if ($this->text[$this->position + 1] == '/') {
                     $this->position += 2;
+                    $prevPosition = $this->position;
                     $name = $this->parseElementEnd();
 
                     if (str_starts_with($name, ':')) {
@@ -64,9 +70,11 @@ abstract class AbstractMLParser extends AbstractParser
                         $reversed = array_slice($reversed, $indexOf + 1);
                         $this->openElements = array_reverse($reversed);
                     } else if ($element instanceof TElement) {
+                        $this->position = $prevPosition;
                         $this->throw("Last opened element is not <$name> but <$element->tagName>");
                     } else {
-                        $this->throw("Last opened element is not <$name>");
+                        $this->position = $prevPosition;
+                        $this->throw("There is no opened element, <$name> closed");
                     }
 
                 } else {
@@ -136,7 +144,7 @@ abstract class AbstractMLParser extends AbstractParser
                         $value = ExpressionParser::Parse($this->readUntill('/\)/'));
                         $this->position++;
                     } else {
-                        $parser = (new ExpressionParser(substr($this->text, $this->position)));
+                        $parser = (new ExpressionParser(substr($this->text, $this->position), $this->fileName, $this->currentFilePosition(), $this->currentLineOffset(), $this->currentColumnOffset()));
                         $value = $parser->parseNormal();
                         $this->position += $parser->position;
                     }
@@ -270,4 +278,6 @@ abstract class AbstractMLParser extends AbstractParser
             }
         }
     }
+
+
 }

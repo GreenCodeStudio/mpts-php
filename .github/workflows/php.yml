@@ -59,6 +59,30 @@ jobs:
         run: composer upgrade --prefer-dist --no-progress
       - name: Run test suite
         run: composer run-script test
+  test84:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+      - name: Install dependencies
+        run: composer upgrade --prefer-dist --no-progress
+      - name: Run test suite
+        run: composer run-script test
+  test85:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+      - name: Install dependencies
+        run: composer upgrade --prefer-dist --no-progress
+      - name: Run test suite
+        run: composer run-script test
   phpstan:
     runs-on: ubuntu-latest
     steps:
