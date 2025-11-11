@@ -8,6 +8,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
 use MKrawczyk\Mpts\Nodes\Expressions\TEDivide;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
+use MKrawczyk\Mpts\Nodes\Expressions\TEModulo;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMultiply;
 use MKrawczyk\Mpts\Nodes\Expressions\TENegate;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
@@ -25,9 +26,9 @@ class ExpressionParser extends AbstractParser
     public function __construct(string $text, ?string $fileName = null, ?int $filePositionOffset = null, ?int $fileLineOffset = null, ?int $fileColumnOffset = null)
     {
         $this->text = $text;
-        $this->filePositionOffset= $filePositionOffset;
-        $this->fileLineOffset= $fileLineOffset;
-        $this->fileColumnOffset= $fileColumnOffset;
+        $this->filePositionOffset = $filePositionOffset;
+        $this->fileLineOffset = $fileLineOffset;
+        $this->fileColumnOffset = $fileColumnOffset;
         $this->fileName = $fileName;
     }
 
@@ -44,12 +45,18 @@ class ExpressionParser extends AbstractParser
             if (preg_match("/\s/", $char)) {
                 $this->position++;
             } else if ($lastNode && $char == '.') {
+                if (!$lastNode) {
+                    $this->throw("Unexpected '.'");
+                }
                 $this->position++;
                 $name = $this->readUntill('/[\'"\(\)=\.:\s>+\-*?]/');
                 $lastNode = new TEProperty($lastNode, $name);
             } else if (!$lastNode && preg_match("/[0-9\.]/", $char)) {
                 $this->position++;
                 $value = $char.$this->readUntill("/[^0-9\.e]/");
+                if (preg_match("/^(\.e*|e+)")) {
+                    $this->throw("Unexpected '$char'");
+                }
                 $lastNode = new TENumber((float)$value);
             } else if ($char == '"') {
                 $this->position++;
@@ -64,12 +71,12 @@ class ExpressionParser extends AbstractParser
                     $lastNode = new TEMethodCall($lastNode);
                     $this->position++;
                     $this->skipWhitespace();
-                    while ($this->position<strlen($this->text) && $this->text[$this->position] != ')') {
+                    while ($this->position < strlen($this->text) && $this->text[$this->position] != ')') {
                         if ($this->position >= strlen($this->text)) $this->throw("Unexpected end of input");
 
                         $value = $this->parseNormal(2);
                         $lastNode->args[] = $value;
-                        if($this->position<strlen($this->text) && $this->text[$this->position] ==',')
+                        if ($this->position < strlen($this->text) && $this->text[$this->position] == ',')
                             $this->position++;
                     }
                     $this->position++;
@@ -110,7 +117,7 @@ class ExpressionParser extends AbstractParser
                 $this->position += 1;
                 $right = $this->parseNormal(4);
                 $lastNode = new TESubtract($lastNode, $right);
-            }else if ($char == '*') {
+            } else if ($char == '*') {
                 if ($endLevel >= 5) {
                     break;
                 }
@@ -124,11 +131,18 @@ class ExpressionParser extends AbstractParser
                 $this->position += 1;
                 $right = $this->parseNormal(5);
                 $lastNode = new TEDivide($lastNode, $right);
+            } else if ($char == '%') {
+                if ($endLevel >= 5) {
+                    break;
+                }
+                $this->position += 1;
+                $right = $this->parseNormal(5);
+                $lastNode = new TEModulo($lastNode, $right);
             } else if ($char == '!') {
                 if ($endLevel > 6) {
                     break;
                 }
-                if($lastNode){
+                if ($lastNode) {
                     $this->throw("unexpected '!'");
                 }
                 $this->position += 1;
@@ -165,6 +179,6 @@ class ExpressionParser extends AbstractParser
 
     private function decodeEntities(string $raw)
     {
-        return html_entity_decode($raw, ENT_QUOTES|ENT_HTML5);
+        return html_entity_decode($raw, ENT_QUOTES | ENT_HTML5);
     }
 }

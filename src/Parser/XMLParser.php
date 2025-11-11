@@ -11,9 +11,9 @@ class XMLParser extends AbstractMLParser
     protected array $onlySiblingsElements = [];
     protected bool $allowAutoClose = false;
 
-    public static function Parse(string $text)
+    public static function Parse(string $text, ?string $filePath = null)
     {
-        return (new self($text))->parseNormal();
+        return (new self($text, $filePath))->parseNormal();
     }
 
     public static function ParseFile(string $filePath)

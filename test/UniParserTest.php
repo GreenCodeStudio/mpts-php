@@ -152,11 +152,16 @@ abstract class  UniParserTest extends TestCase
 
     public function testIf()
     {
-        $obj = $this->parse("<:if condition=false>text</:if><:else>text</:else>");
+        $whitespace=" \t\n\r";
+        $obj = $this->parse("<:if condition=(a > 0)>text</:if>".$whitespace."<:else>text</:else>");
 
         $this->assertInstanceOf(TDocumentFragment::class, $obj);
         $this->assertInstanceOf(TIf::class, $obj->children[0]);
-        $this->assertInstanceOf(TEBoolean::class, $obj->children[0]->conditions[0]->expression);
+        $this->assertInstanceOf(TEComparsion::class, $obj->children[0]->conditions[0]->expression);
+        $this->assertTrue( $obj->children[0]->conditions[0]->expression->isGreaterThan);
+        $this->assertTrue( $obj->children[0]->conditions[0]->expression->orEqual);
+        $this->assertInstanceOf(TEVariable::class, $obj->children[0]->conditions[0]->expression->left);
+        $this->assertInstanceOf(TENumber::class, $obj->children[0]->conditions[0]->expression->right);
         $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[0]->children[0]);
         $this->assertInstanceOf(TText::class, $obj->children[0]->else->children[0]);
     }

@@ -55,8 +55,8 @@ abstract class AbstractMLParser extends AbstractParser
                     $this->position += 2;
                     //ignore xml declaration
                 } else if ($this->text[$this->position + 1] == '/') {
-                    $this->position += 2;
                     $prevPosition = $this->position;
+                    $this->position += 2;
                     $name = $this->parseElementEnd();
 
                     if (str_starts_with($name, ':')) {
