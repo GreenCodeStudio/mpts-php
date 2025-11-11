@@ -29,7 +29,7 @@ class HTMLParser extends AbstractMLParser
             array_pop($this->openElements);
             $parent = $this->openElements[count($this->openElements) - 1];
         }
-        $parent->children[] = $element;
+        $parent->addChild($element);
         if (!$autoclose && !in_array(strtolower($element->tagName), $this->voidElements))
             $this->openElements[] = $element;
     }
