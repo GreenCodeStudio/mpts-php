@@ -29,7 +29,7 @@ class TEProperty extends TEExpression
                 return $obj[$name];
             else if(isset($obj->$name))
                 return $obj->$name;
-            else if(method_exists($obj, $name))
+          else if (is_object($obj) && method_exists($obj, $name))
                 return fn(...$args) => $obj->$name(...$args);
         }
     }
