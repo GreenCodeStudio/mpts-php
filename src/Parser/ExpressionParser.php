@@ -2,6 +2,7 @@
 
 namespace MKrawczyk\Mpts\Parser;
 
+use MKrawczyk\Mpts\CodePosition;
 use MKrawczyk\Mpts\Nodes\Expressions\TEAdd;
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
@@ -32,9 +33,9 @@ class ExpressionParser extends AbstractParser
         $this->fileName = $fileName;
     }
 
-    public static function Parse(string $text)
+    public static function Parse(string $text, ?CodePosition $codePosition = null)
     {
-        return (new ExpressionParser($text))->parseNormal();
+        return (new ExpressionParser($text, $codePosition?->fileName, $codePosition?->fileOffset, $codePosition?->lineNumber, $codePosition->columnNumber))->parseNormal();
     }
 
     public function parseNormal($endLevel = 0)
@@ -42,6 +43,7 @@ class ExpressionParser extends AbstractParser
         $lastNode = null;
         while ($this->position < strlen($this->text)) {
             $char = $this->text[$this->position];
+            $partCodePosition = $this->currentCodePosition();
             if (preg_match("/\s/", $char)) {
                 $this->position++;
             } else if ($lastNode && $char == '.') {
@@ -170,7 +172,7 @@ class ExpressionParser extends AbstractParser
                 } else if ($name == '') {
                     $this->throw("Empty variable name");
                 } else {
-                    $lastNode = new TEVariable($name);
+                    $lastNode = new TEVariable($name, $partCodePosition);
                 }
             }
         }

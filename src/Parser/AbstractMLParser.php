@@ -181,6 +181,7 @@ abstract class AbstractMLParser extends AbstractParser
 
     protected function parseExpression($end)
     {
+        $codePosition = $this->currentCodePosition();
         $text = "";
 
         while ($this->position < strlen($this->text)) {
@@ -191,7 +192,7 @@ abstract class AbstractMLParser extends AbstractParser
             $text .= $this->text[$this->position];
             $this->position++;
         }
-        return ExpressionParser::Parse($text);
+        return ExpressionParser::Parse($text, $codePosition);
     }
 
     protected function convertToSpecialElement($result, $element)

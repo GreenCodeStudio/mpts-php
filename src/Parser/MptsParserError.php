@@ -2,20 +2,20 @@
 
 namespace MKrawczyk\Mpts\Parser;
 
+use MKrawczyk\Mpts\CodePosition;
+
 class MptsParserError extends \Exception
 {
     public string $messageRaw;
-    public int $lineRaw;
-    public int $column;
+    public CodePosition $codePosition;
     public string $sample;
 
-    public function __construct(string $message, int $line, int $column, string $sample, ?string $fileName = null)
+    public function __construct(string $message, CodePosition $codePosition, string $sample)
     {
-        parent::__construct($message."\r\n".preg_replace("/\n/", '\\n', $sample)."\r\n".($fileName??'unknownFile').":".$line.":".$column);
+        parent::__construct($message."\r\n".preg_replace("/\n/", '\\n', $sample)."\r\n".$codePosition);
 
         $this->messageRaw = $message;
-        $this->lineRaw = $line;
-        $this->column = $column;
+        $this->codePosition = $codePosition;
         $this->sample = $sample;
     }
 }

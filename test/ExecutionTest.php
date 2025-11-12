@@ -212,4 +212,13 @@ class ExecutionTest extends TestCase
         $result = $obj->execute($env);
         $this->assertEmpty($result->children);
     }
+    public function testNonExistingVariable()
+    {
+        $this->expectExceptionMessageMatches('/Undefined variable: abc/');
+        $this->expectExceptionMessageMatches('/file\.mpts:1:2/');
+        $obj = XMLParser::Parse("{{abc}}", "file.mpts");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $obj->execute($env);
+    }
 }

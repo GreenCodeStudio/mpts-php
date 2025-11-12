@@ -1,6 +1,9 @@
 <?php
 
 namespace MKrawczyk\Mpts\Parser;
+
+use MKrawczyk\Mpts\CodePosition;
+
 abstract class  AbstractParser
 {
     protected string $text;
@@ -44,11 +47,12 @@ abstract class  AbstractParser
 
     protected function throw($message)
     {
-        throw new MptsParserError($message, $this->currentLineOffset()+1, $this->currentColumnOffset(), substr($this->text, $this->position, 10), $this->fileName);
+        throw new MptsParserError($message, $this->currentCodePosition(), substr($this->text, $this->position, 10));
     }
+
     public function currentLineOffset()
     {
-        return substr_count(substr($this->text, 0, $this->position), "\n") + $this->fileLineOffset ?? 0;
+        return substr_count(substr($this->text, 0, $this->position), "\n") + ($this->fileLineOffset ?? 1);
     }
 
     public function currentColumnOffset()
@@ -61,6 +65,16 @@ abstract class  AbstractParser
 
     public function currentFilePosition()
     {
-        return $this->position+($this->filePositionOffset ?? 0);
+        return $this->position + ($this->filePositionOffset ?? 0);
+    }
+
+    public function currentCodePosition(): CodePosition
+    {
+        return new CodePosition(
+            $this->fileName,
+            $this->currentLineOffset(),
+            $this->currentColumnOffset(),
+            $this->currentFilePosition()
+        );
     }
 }
