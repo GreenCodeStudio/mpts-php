@@ -56,7 +56,7 @@ class ExpressionParser extends AbstractParser
             } else if (!$lastNode && preg_match("/[0-9\.]/", $char)) {
                 $this->position++;
                 $value = $char.$this->readUntill("/[^0-9\.e]/");
-                if (preg_match("/^(\.e*|e+)")) {
+                if (preg_match("/^(\.e*|e+)", $char)) {
                     $this->throw("Unexpected '$char'");
                 }
                 $lastNode = new TENumber((float)$value);
