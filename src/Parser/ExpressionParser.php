@@ -35,7 +35,7 @@ class ExpressionParser extends AbstractParser
 
     public static function Parse(string $text, ?CodePosition $codePosition = null)
     {
-        return (new ExpressionParser($text, $codePosition?->fileName, $codePosition?->fileOffset, $codePosition?->lineNumber, $codePosition->columnNumber))->parseNormal();
+        return (new ExpressionParser($text, $codePosition?->fileName, $codePosition?->fileOffset, $codePosition?->lineNumber, $codePosition?->columnNumber))->parseNormal();
     }
 
     public function parseNormal($endLevel = 0)
