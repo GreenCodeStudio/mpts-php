@@ -8,14 +8,14 @@ class TEComparsion extends TEExpression
 {
     public TEExpression $left;
     public TEExpression $right;
-    public bool $isGreaterThat;
+    public bool $isGreaterThan;
     public bool $orEqual;
 
-    public function __construct(TEExpression $left, TEExpression $right, bool $isGreaterThat, bool $orEqual)
+    public function __construct(TEExpression $left, TEExpression $right, bool $isGreaterThan, bool $orEqual)
     {
         $this->left = $left;
         $this->right = $right;
-        $this->isGreaterThat = $isGreaterThat;
+        $this->isGreaterThan = $isGreaterThan;
         $this->orEqual = $orEqual;
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
+use MKrawczyk\Mpts\Nodes\Expressions\TEComparsion;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
@@ -159,7 +160,7 @@ abstract class  UniParserTest extends TestCase
         $this->assertInstanceOf(TIf::class, $obj->children[0]);
         $this->assertInstanceOf(TEComparsion::class, $obj->children[0]->conditions[0]->expression);
         $this->assertTrue( $obj->children[0]->conditions[0]->expression->isGreaterThan);
-        $this->assertTrue( $obj->children[0]->conditions[0]->expression->orEqual);
+        $this->assertFalse( $obj->children[0]->conditions[0]->expression->orEqual);
         $this->assertInstanceOf(TEVariable::class, $obj->children[0]->conditions[0]->expression->left);
         $this->assertInstanceOf(TENumber::class, $obj->children[0]->conditions[0]->expression->right);
         $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[0]->children[0]);

@@ -4,7 +4,9 @@ namespace MKrawczyk\Mpts\Parser;
 
 use MKrawczyk\Mpts\CodePosition;
 use MKrawczyk\Mpts\Nodes\Expressions\TEAdd;
+use MKrawczyk\Mpts\Nodes\Expressions\TEAnd;
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
+use MKrawczyk\Mpts\Nodes\Expressions\TEComparsion;
 use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
 use MKrawczyk\Mpts\Nodes\Expressions\TEDivide;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
@@ -13,6 +15,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEModulo;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMultiply;
 use MKrawczyk\Mpts\Nodes\Expressions\TENegate;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
+use MKrawczyk\Mpts\Nodes\Expressions\TEOr;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
@@ -56,7 +59,7 @@ class ExpressionParser extends AbstractParser
             } else if (!$lastNode && preg_match("/[0-9\.]/", $char)) {
                 $this->position++;
                 $value = $char.$this->readUntill("/[^0-9\.e]/");
-                if (preg_match("/^(\.e*|e+)", $char)) {
+                if (preg_match("/^(\.e*|e+)/", $char)) {
                     $this->throw("Unexpected '$char'");
                 }
                 $lastNode = new TENumber((float)$value);
@@ -84,82 +87,135 @@ class ExpressionParser extends AbstractParser
                     $this->position++;
                 } else {
                     $this->position++;
-                    $value = $this->parseNormal(1);
+                    $value = $this->parseNormal(10);
                     $this->position++;
                     $lastNode = $value;
                 }
             } else if ($char == ")") {
-                if ($endLevel >= 1) {
+                if ($endLevel == 10) {
+                    $this->position++;
+                    break;
+                } else if ($endLevel >= 10) {
                     break;
                 } else {
                     $this->throw("( not opened");
                 }
             } else if ($char == '=' && $this->text[$this->position + 1] == "=") {
-                $this->position += 2;
-                $right = $this->parseNormal(2);
-                $lastNode = new TEEqual($lastNode, $right);
-            } else if ($char == '?' && $this->text[$this->position + 1] == "?") {
-                if ($endLevel >= 5) {
+                if ($endLevel >= 40) {
                     break;
                 }
                 $this->position += 2;
-                $right = $this->parseNormal(5);
+                $right = $this->parseNormal(40);
+                $lastNode = new TEEqual($lastNode, $right);
+            } else if ($char == '!' && $this->text[$this->position + 1] == "=") {
+                if ($endLevel >= 40) {
+                    break;
+                }
+                $this->position += 2;
+                $right = $this->parseNormal(40);
+                $lastNode = new TENotEqual($lastNode, $right);
+            } else if ($char == '&' && $this->text[$this->position + 1] == "&") {
+                if ($endLevel >= 20) {
+                    break;
+                }
+                $this->position += 2;
+                $right = $this->parseNormal(20);
+                $lastNode = new TEAnd($lastNode, $right);
+            } else if ($char == '|' && $this->text[$this->position + 1] == "|") {
+                $this->position += 2;
+                $right = $this->parseNormal(20);
+                $lastNode = new TEOr($lastNode, $right);
+            } else if ($char == '?' && $this->text[$this->position + 1] == "?") {
+                if ($endLevel >= 20) {
+                    break;
+                }
+                $this->position += 2;
+                $right = $this->parseNormal(20);
                 $lastNode = new TEOrNull($lastNode, $right);
             } else if ($char == '+') {
-                if ($endLevel >= 4) {
+                if ($endLevel >= 70) {
                     break;
                 }
                 $this->position += 1;
-                $right = $this->parseNormal(4);
+                $right = $this->parseNormal(70);
                 $lastNode = new TEAdd($lastNode, $right);
             } else if ($char == '-') {
-                if ($endLevel >= 4) {
+                if ($endLevel >= 70) {
                     break;
                 }
                 $this->position += 1;
-                $right = $this->parseNormal(4);
+                $right = $this->parseNormal(70);
                 $lastNode = new TESubtract($lastNode, $right);
             } else if ($char == '*') {
-                if ($endLevel >= 5) {
+                if ($endLevel >= 60) {
                     break;
                 }
                 $this->position += 1;
-                $right = $this->parseNormal(5);
+                $right = $this->parseNormal(60);
                 $lastNode = new TEMultiply($lastNode, $right);
             } else if ($char == '/' && $this->text[$this->position + 1] != '>') {
-                if ($endLevel >= 5) {
+                if ($endLevel >= 60) {
                     break;
                 }
                 $this->position += 1;
-                $right = $this->parseNormal(5);
+                $right = $this->parseNormal(60);
                 $lastNode = new TEDivide($lastNode, $right);
             } else if ($char == '%') {
-                if ($endLevel >= 5) {
+                if ($endLevel >= 60) {
                     break;
                 }
                 $this->position += 1;
-                $right = $this->parseNormal(5);
+                $right = $this->parseNormal(60);
                 $lastNode = new TEModulo($lastNode, $right);
             } else if ($char == '!') {
-                if ($endLevel > 6) {
+                if ($endLevel >= 30) {
                     break;
                 }
                 if ($lastNode) {
                     $this->throw("unexpected '!'");
                 }
                 $this->position += 1;
-                $right = $this->parseNormal(6);
+                $right = $this->parseNormal(30);
                 $lastNode = new TENegate($right);
             } else if ($char == ':') {
-                $this->position += 1;
-                $right = $this->parseNormal(3);
-                $lastNode = new TEConcatenate($lastNode, $right);
-            } else if ($char == ">" || $char == "\\") {
-                if ($lastNode) {
+                if ($endLevel >= 50) {
                     break;
-                } else {
-                    $this->throw("Unexpected character");
                 }
+                $this->position += 1;
+                $right = $this->parseNormal(50);
+                $lastNode = new TEConcatenate($lastNode, $right);
+            } else if ($char == ">") {
+                if ($endLevel == 0) {
+                    if ($lastNode) {
+                        break;
+                    } else {
+                        $this->throw("Unexpected character");
+                    }
+                } else {//in parenthesis
+                    if ($endLevel >= 40) {
+                        break;
+                    }
+                    $this->position++;
+                    $orEqual = $this->text[$this->position] == '=';
+                    if ($orEqual) {
+                        $this->position++;
+                    }
+                    $right = $this->parseNormal(40);
+                    $lastNode = new TEComparsion($lastNode, $right, true, $orEqual);
+
+                }
+            } else if ($char == "<") {
+                if ($endLevel >= 40) {
+                    break;
+                }
+                $this->position++;
+                $orEqual = $this->text[$this->position] == '=';
+                if ($orEqual) {
+                    $this->position++;
+                }
+                $right = $this->parseNormal(40);
+                $lastNode = new TEComparsion($lastNode, $right, true, $orEqual);
+
             } else {
                 if ($lastNode) {
                     break;

@@ -210,8 +210,10 @@ class ExecutionTest extends TestCase
         $env = new Environment();
         $env->document = new DOMDocument();
         $result = $obj->execute($env);
-        $this->assertEmpty($result->children);
+        $this->assertEquals("root",  $result->childNodes[0]->tagName);
+        $this->assertEmpty($result->childNodes[0]->childNodes);
     }
+
     public function testNonExistingVariable()
     {
         $this->expectExceptionMessageMatches('/Undefined variable: abc/');

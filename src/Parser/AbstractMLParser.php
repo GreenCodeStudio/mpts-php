@@ -141,8 +141,9 @@ abstract class AbstractMLParser extends AbstractParser
                     $char2 = $this->text[$this->position];
                     if ($char2 == '(') {
                         $this->position++;
-                        $value = ExpressionParser::Parse($this->readUntill('/\)/'));
-                        $this->position++;
+                        $parser = (new ExpressionParser(substr($this->text, $this->position), $this->fileName, $this->currentFilePosition(), $this->currentLineOffset(), $this->currentColumnOffset()));
+                        $value = $parser->parseNormal(10);
+                        $this->position += $parser->position;
                     } else {
                         $parser = (new ExpressionParser(substr($this->text, $this->position), $this->fileName, $this->currentFilePosition(), $this->currentLineOffset(), $this->currentColumnOffset()));
                         $value = $parser->parseNormal();
@@ -217,6 +218,11 @@ abstract class AbstractMLParser extends AbstractParser
                 $this->openElements[] = $last;
         } else if (strtolower($result->element->tagName) == ":else") {
             $last = end($element->children);
+            if ($last instanceof TText && trim($last->text) == '') {
+                //whitespace
+                $element->children = array_slice($element->children, 0, count($element->children) - 1);
+                $last = end($element->children);
+            }
             if (!($last instanceof TIf && $last->else == null))
                 $this->throw("need if before else");
 
