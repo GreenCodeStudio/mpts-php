@@ -7,6 +7,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\TAttribute;
 use MKrawczyk\Mpts\Nodes\TComment;
 use MKrawczyk\Mpts\Nodes\TDocumentFragment;
+use MKrawczyk\Mpts\Nodes\TDocumentType;
 use MKrawczyk\Mpts\Nodes\TElement;
 use MKrawczyk\Mpts\Nodes\TExpressionSubnode;
 use MKrawczyk\Mpts\Nodes\TExpressionText;
@@ -80,7 +81,9 @@ abstract class AbstractMLParser extends AbstractParser
                 } else {
                     $this->position++;
                     $result = $this->parseElement();
-                    if (str_starts_with($result->element->tagName, ':')) {
+                    if ($result->element instanceof TDocumentType) {
+                        $this->addElement($result->element, $result->autoclose);
+                    } else if (str_starts_with($result->element->tagName, ':')) {
                         $this->convertToSpecialElement($result, $element);
                     } else {
                         $this->addElement($result->element, $result->autoclose);
@@ -110,47 +113,55 @@ abstract class AbstractMLParser extends AbstractParser
 
     protected function parseElement()
     {
-        $autoclose = false;
-        $element = new TElement();
-        $element->parsePosition = $this->position;
-        while ($this->position < strlen($this->text)) {
-            $char = $this->text[$this->position];
-            if ($char == '>' || $char == ' ' || $char == '/')
-                break;
-            $element->tagName .= $char;
+        if (substr($this->text, $this->position, 8) == '!DOCTYPE') {
+            $autoclose = true;
+            $element = new TDocumentType();
+            $this->position += 8;
+            $element->content = trim($this->readUntill("/>/"));
             $this->position++;
-        }
-        while ($this->position < strlen($this->text)) {
-            $char = $this->text[$this->position];
-            if ($char == '>') {
-                $this->position++;
-                break;
-            } else if ($char == '/') {
-                $this->position++;
-                $autoclose = true;
-            } else if (preg_match("/\s/", $char)) {
-                $this->position++;
-            } else {
-                $name = $this->readUntill("/[\s=\/]/");
-                $value = null;
-                $this->skipWhitespace();
+        } else {
+            $autoclose = false;
+            $element = new TElement();
+            $element->parsePosition = $this->position;
+            while ($this->position < strlen($this->text)) {
                 $char = $this->text[$this->position];
-                if ($char == '=') {
+                if ($char == '>' || $char == ' ' || $char == '/')
+                    break;
+                $element->tagName .= $char;
+                $this->position++;
+            }
+            while ($this->position < strlen($this->text)) {
+                $char = $this->text[$this->position];
+                if ($char == '>') {
                     $this->position++;
+                    break;
+                } else if ($char == '/') {
+                    $this->position++;
+                    $autoclose = true;
+                } else if (preg_match("/\s/", $char)) {
+                    $this->position++;
+                } else {
+                    $name = $this->readUntill("/[\s=\/]/");
+                    $value = null;
                     $this->skipWhitespace();
-                    $char2 = $this->text[$this->position];
-                    if ($char2 == '(') {
+                    $char = $this->text[$this->position];
+                    if ($char == '=') {
                         $this->position++;
-                        $parser = (new ExpressionParser(substr($this->text, $this->position), $this->fileName, $this->currentFilePosition(), $this->currentLineOffset(), $this->currentColumnOffset()));
-                        $value = $parser->parseNormal(10);
-                        $this->position += $parser->position;
-                    } else {
-                        $parser = (new ExpressionParser(substr($this->text, $this->position), $this->fileName, $this->currentFilePosition(), $this->currentLineOffset(), $this->currentColumnOffset()));
-                        $value = $parser->parseNormal();
-                        $this->position += $parser->position;
+                        $this->skipWhitespace();
+                        $char2 = $this->text[$this->position];
+                        if ($char2 == '(') {
+                            $this->position++;
+                            $parser = (new ExpressionParser(substr($this->text, $this->position), $this->fileName, $this->currentFilePosition(), $this->currentLineOffset(), $this->currentColumnOffset()));
+                            $value = $parser->parseNormal(10);
+                            $this->position += $parser->position;
+                        } else {
+                            $parser = (new ExpressionParser(substr($this->text, $this->position), $this->fileName, $this->currentFilePosition(), $this->currentLineOffset(), $this->currentColumnOffset()));
+                            $value = $parser->parseNormal();
+                            $this->position += $parser->position;
+                        }
                     }
+                    $element->attributes[] = new TAttribute($name, $value);
                 }
-                $element->attributes[] = new TAttribute($name, $value);
             }
         }
 
@@ -202,12 +213,17 @@ abstract class AbstractMLParser extends AbstractParser
             $node = new TIf();
             $expression = $result->element->getAttribute('condition')->expression;
             $node->conditions[] = (object)['expression' => $expression, 'children' => []];
-            $element->children[] = $node;
+            $element->addChild($node);
 
             if (!$result->autoclose)
                 $this->openElements[] = $node;
         } else if (strtolower($result->element->tagName) == ":else-if") {
             $last = end($element->children);
+            if ($last instanceof TText && trim($last->text) == '') {
+                //whitespace
+                $element->children = array_slice($element->children, 0, count($element->children) - 1);
+                $last = end($element->children);
+            }
             if (!($last instanceof TIf && $last->else == null))
                 $this->throw("need if before else-if");
 

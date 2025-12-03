@@ -114,8 +114,8 @@ abstract class  UniParserTest extends TestCase
     }
     public function testElementWithSyntaxErrorInAttribute()
     {
-        $this->expectExceptionMessageMatches("/source object expected before dot/");
-        $this->expectExceptionMessageMatches("/file\.mpts:1:9");
+        $this->expectExceptionMessageMatches("/unexpected '\.'/");
+        $this->expectExceptionMessageMatches("/file\.mpts:1:9/");
         $this->parse("<img src=.value/>", "file.mpts");
     }
 
@@ -299,13 +299,13 @@ abstract class  UniParserTest extends TestCase
         $obj = $this->parse("<!DOCTYPE html>");
         $this->assertInstanceOf(TDocumentFragment::class, $obj);
         $this->assertInstanceOf(\MKrawczyk\Mpts\Nodes\TDocumentType::class, $obj->children[0]);
-        $this->assertEquals("html", $obj->children[0]->text);
+        $this->assertEquals("html", $obj->children[0]->content);
     }
     public function testDTDCustom()
     {
         $obj = $this->parse("<!DOCTYPE PUBLIC SYSTEM \"file.dtd\">");
         $this->assertInstanceOf(TDocumentFragment::class, $obj);
         $this->assertInstanceOf(\MKrawczyk\Mpts\Nodes\TDocumentType::class, $obj->children[0]);
-        $this->assertEquals('PUBLIC SYSTEM "file.dtd"', $obj->children[0]->text);
+        $this->assertEquals('PUBLIC SYSTEM "file.dtd"', $obj->children[0]->content);
     }
 }

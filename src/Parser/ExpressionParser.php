@@ -60,6 +60,7 @@ class ExpressionParser extends AbstractParser
                 $this->position++;
                 $value = $char.$this->readUntill("/[^0-9\.e]/");
                 if (preg_match("/^(\.e*|e+)/", $char)) {
+                    $this->position--;
                     $this->throw("Unexpected '$char'");
                 }
                 $lastNode = new TENumber((float)$value);
@@ -79,7 +80,7 @@ class ExpressionParser extends AbstractParser
                     while ($this->position < strlen($this->text) && $this->text[$this->position] != ')') {
                         if ($this->position >= strlen($this->text)) $this->throw("Unexpected end of input");
 
-                        $value = $this->parseNormal(2);
+                        $value = $this->parseNormal(10);
                         $lastNode->args[] = $value;
                         if ($this->position < strlen($this->text) && $this->text[$this->position] == ',')
                             $this->position++;
@@ -88,7 +89,6 @@ class ExpressionParser extends AbstractParser
                 } else {
                     $this->position++;
                     $value = $this->parseNormal(10);
-                    $this->position++;
                     $lastNode = $value;
                 }
             } else if ($char == ")") {
@@ -100,7 +100,10 @@ class ExpressionParser extends AbstractParser
                 } else {
                     $this->throw("( not opened");
                 }
-            } else if ($char == '=' && $this->text[$this->position + 1] == "=") {
+            } else if ($char == '=') {
+                if ($this->text[$this->position + 1] != "=") {
+                    $this->throw("Assignment '=' is not allowed in expressions");
+                }
                 if ($endLevel >= 40) {
                     break;
                 }
@@ -133,42 +136,42 @@ class ExpressionParser extends AbstractParser
                 $right = $this->parseNormal(20);
                 $lastNode = new TEOrNull($lastNode, $right);
             } else if ($char == '+') {
-                if ($endLevel >= 70) {
+                if ($endLevel >= 60) {
                     break;
                 }
                 $this->position += 1;
-                $right = $this->parseNormal(70);
+                $right = $this->parseNormal(60);
                 $lastNode = new TEAdd($lastNode, $right);
             } else if ($char == '-') {
+                if ($endLevel >= 60) {
+                    break;
+                }
+                $this->position += 1;
+                $right = $this->parseNormal(60);
+                $lastNode = new TESubtract($lastNode, $right);
+            } else if ($char == '*') {
                 if ($endLevel >= 70) {
                     break;
                 }
                 $this->position += 1;
                 $right = $this->parseNormal(70);
-                $lastNode = new TESubtract($lastNode, $right);
-            } else if ($char == '*') {
-                if ($endLevel >= 60) {
-                    break;
-                }
-                $this->position += 1;
-                $right = $this->parseNormal(60);
                 $lastNode = new TEMultiply($lastNode, $right);
             } else if ($char == '/' && $this->text[$this->position + 1] != '>') {
-                if ($endLevel >= 60) {
+                if ($endLevel >= 70) {
                     break;
                 }
                 $this->position += 1;
-                $right = $this->parseNormal(60);
+                $right = $this->parseNormal(70);
                 $lastNode = new TEDivide($lastNode, $right);
             } else if ($char == '%') {
-                if ($endLevel >= 60) {
+                if ($endLevel >= 70) {
                     break;
                 }
                 $this->position += 1;
-                $right = $this->parseNormal(60);
+                $right = $this->parseNormal(70);
                 $lastNode = new TEModulo($lastNode, $right);
             } else if ($char == '!') {
-                if ($endLevel >= 30) {
+                if ($endLevel > 30) {
                     break;
                 }
                 if ($lastNode) {
