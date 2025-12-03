@@ -14,6 +14,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TEModulo;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMultiply;
 use MKrawczyk\Mpts\Nodes\Expressions\TENegate;
+use MKrawczyk\Mpts\Nodes\Expressions\TENotEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOr;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;

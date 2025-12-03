@@ -22,7 +22,7 @@ class TEComparsion extends TEExpression
     public function execute(Environment $env): string
     {
         $l=$this->left->execute($env) ;$r= $this->right->execute($env);
-        if($this->isGreaterThat){
+        if($this->isGreaterThan){
             if($this->orEqual){
                 return ($l>=$r) ;
             }else{
