@@ -4,6 +4,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEComparsion;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
+use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
 use MKrawczyk\Mpts\Nodes\TAttribute;
@@ -292,6 +293,37 @@ abstract class  UniParserTest extends TestCase
         $this->assertEquals("attr", $attr->name);
         $this->assertInstanceOf(TEString::class, $attr->expression);
         $this->assertEquals("value", $attr->expression->value);
+    }
+
+    public function testAttributeWithMethodCall()
+    {
+        $obj = $this->parse("<div attr=variable.method(1,2) attr2=variable.method2(3,4)></div>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $attr = $obj->children[0]->attributes[0];
+        $this->assertInstanceOf(TAttribute::class, $attr);
+        $this->assertEquals("attr", $attr->name);
+        $this->assertInstanceOf(TEMethodCall::class, $attr->expression);
+        $this->assertInstanceOf(TEProperty::class, $attr->expression->source);
+        $this->assertEquals("method", $attr->expression->source->name);
+        $this->assertInstanceOf(TEVariable::class, $attr->expression->source->source);
+        $this->assertEquals("variable", $attr->expression->source->source->name);
+        $this->assertEquals(2, count($attr->expression->args));
+        $this->assertEquals(1, $attr->expression->args[0]->value);
+        $this->assertEquals(2, $attr->expression->args[1]->value);
+
+
+        $attr2 = $obj->children[0]->attributes[1];
+        $this->assertInstanceOf(TAttribute::class, $attr2);
+        $this->assertEquals("attr2", $attr2->name);
+        $this->assertInstanceOf(TEMethodCall::class, $attr2->expression);
+        $this->assertInstanceOf(TEProperty::class, $attr2->expression->source);
+        $this->assertEquals("method2", $attr2->expression->source->name);
+        $this->assertInstanceOf(TEVariable::class, $attr2->expression->source->source);
+        $this->assertEquals("variable", $attr2->expression->source->source->name);
+        $this->assertEquals(2, count($attr2->expression->args));
+        $this->assertEquals(3, $attr2->expression->args[0]->value);
+        $this->assertEquals(4, $attr2->expression->args[1]->value);
     }
 
     public function testDTDHtml5()

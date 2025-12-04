@@ -49,6 +49,9 @@ class ExpressionParser extends AbstractParser
             $char = $this->text[$this->position];
             $partCodePosition = $this->currentCodePosition();
             if (preg_match("/\s/", $char)) {
+                if($endLevel==1)
+                    break;
+                else
                 $this->position++;
             } else if ($lastNode && $char == '.') {
                 if (!$lastNode) {
@@ -81,7 +84,7 @@ class ExpressionParser extends AbstractParser
                     while ($this->position < strlen($this->text) && $this->text[$this->position] != ')') {
                         if ($this->position >= strlen($this->text)) $this->throw("Unexpected end of input");
 
-                        $value = $this->parseNormal(10);
+                        $value = $this->parseNormal(11);
                         $lastNode->args[] = $value;
                         if ($this->position < strlen($this->text) && $this->text[$this->position] == ',')
                             $this->position++;
@@ -189,7 +192,7 @@ class ExpressionParser extends AbstractParser
                 $right = $this->parseNormal(50);
                 $lastNode = new TEConcatenate($lastNode, $right);
             } else if ($char == ">") {
-                if ($endLevel == 0) {
+                if ($endLevel == 0 || $endLevel == 1) {
                     if ($lastNode) {
                         break;
                     } else {

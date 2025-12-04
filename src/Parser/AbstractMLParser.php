@@ -156,7 +156,7 @@ abstract class AbstractMLParser extends AbstractParser
                             $this->position += $parser->position;
                         } else {
                             $parser = (new ExpressionParser(substr($this->text, $this->position), $this->fileName, $this->currentFilePosition(), $this->currentLineOffset(), $this->currentColumnOffset()));
-                            $value = $parser->parseNormal();
+                            $value = $parser->parseNormal(1);
                             $this->position += $parser->position;
                         }
                     }
