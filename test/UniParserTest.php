@@ -340,4 +340,14 @@ abstract class  UniParserTest extends TestCase
         $this->assertInstanceOf(\MKrawczyk\Mpts\Nodes\TDocumentType::class, $obj->children[0]);
         $this->assertEquals('PUBLIC SYSTEM "file.dtd"', $obj->children[0]->content);
     }
+
+    public function testQuickClosing()
+    {
+        $obj = $this->parse("<span/><span/>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $this->assertEquals("span", $obj->children[0]->tagName);
+        $this->assertInstanceOf(TElement::class, $obj->children[1]);
+        $this->assertEquals("span", $obj->children[1]->tagName);
+    }
 }

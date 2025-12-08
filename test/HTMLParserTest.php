@@ -30,38 +30,6 @@ class HTMLParserTest extends UniParserTest
         $obj = $this->parse("<span><strong></span></strong>", "file.mpts");
     }
 
-    /*
-     *     describe('auto closing tags', async () => {
-        const tags = [
-            'area',
-            'base',
-            'br',
-            'col',
-            'embed',
-            'hr',
-            'img',
-            'input',
-            'link',
-            'meta',
-            'param',
-            'source',
-            'track',
-            'wbr'
-        ];
-        for (const tag of tags) {
-            it('auto closing <' + tag + '>', async () => {
-                const tagCase = tag.split().map(c => Math.random() > 0.5 ? c.toUpperCase() : c.toLowerCase()).join('');
-
-                const obj = HTMLParser.Parse("<" + tagCase + ">after");
-                expect(obj).to.be.instanceOf(TDocumentFragment);
-                expect(obj.children[0]).to.be.instanceOf(TElement);
-                expect(obj.children[0].tagName).to.be.equal(tagCase);
-                expect(obj.children[1]).to.be.instanceOf(TText);
-                expect(obj.children[1].text).to.be.equal(after);
-            });
-        }
-    });
-     */
 
     public function testAutoClosingTags()
     {
@@ -130,19 +98,6 @@ class HTMLParserTest extends UniParserTest
         $this->assertInstanceOf(TElement::class, $obj->children[0]->children[1]);
         $this->assertEquals("section", $obj->children[0]->children[1]->tagName);
     }
-
-    /*
-     *         it('p closed by parent', async () => {
-            const obj = HTMLParser.Parse("<div><p>content</div>");
-            expect(obj).to.be.instanceOf(TDocumentFragment);
-            expect(obj.children[0]).to.be.instanceOf(TElement);
-            expect(obj.children[0].tagName).to.be.equals("div");
-            expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
-            expect(obj.children[0].children[0].tagName).to.be.equals("p");
-            expect(obj.children[0].children[0].children[0]).to.be.instanceOf(TText);
-            expect(obj.children[0].children[0].children[0].text).to.be.equal("content");
-        });
-     */
     public function testPClosedByParent()
     {
         $obj = $this->parse("<div><p>content</div>");
@@ -245,46 +200,6 @@ class HTMLParserTest extends UniParserTest
         $this->assertEquals("li", $obj->children[0]->children[2]->tagName);
         $this->assertEquals("three", $obj->children[0]->children[2]->children[0]->text);
     }
-
-    /*
-     *     it('dt element ommiting end tag', async () => {
-                // Test dt element followed by another dt element
-                const obj1 = HTMLParser.Parse("<dl><dt>term1<dt>term2<dd>def</dd></dl>");
-                expect(obj1).to.be.instanceOf(TDocumentFragment);
-                expect(obj1.children[0]).to.be.instanceOf(TElement);
-                expect(obj1.children[0].tagName).to.be.equals("dl");
-                expect(obj1.children[0].children[0]).to.be.instanceOf(TElement);
-                expect(obj1.children[0].children[0].tagName).to.be.equals("dt");
-                expect(obj1.children[0].children[0].children[0]).to.be.instanceOf(TText);
-                expect(obj1.children[0].children[0].children[0].text).to.be.equals("term1");
-                expect(obj1.children[0].children[1]).to.be.instanceOf(TElement);
-                expect(obj1.children[0].children[1].tagName).to.be.equals("dt");
-                expect(obj1.children[0].children[1].children[0]).to.be.instanceOf(TText);
-                expect(obj1.children[0].children[1].children[0].text).to.be.equals("term2");
-                expect(obj1.children[0].children[2]).to.be.instanceOf(TElement);
-                expect(obj1.children[0].children[2].tagName).to.be.equals("dd");
-                expect(obj1.children[0].children[2].children[0]).to.be.instanceOf(TText);
-                expect(obj1.children[0].children[2].children[0].text).to.be.equals("def");
-
-                // Test dt element followed by dd element
-                const obj2 = HTMLParser.Parse("<dl><dt>term<dd>def1<dd>def2</dd></dl>");
-                expect(obj2).to.be.instanceOf(TDocumentFragment);
-                expect(obj2.children[0]).to.be.instanceOf(TElement);
-                expect(obj2.children[0].tagName).to.be.equals("dl");
-                expect(obj2.children[0].children[0]).to.be.instanceOf(TElement);
-                expect(obj2.children[0].children[0].tagName).to.be.equals("dt");
-                expect(obj2.children[0].children[0].children[0]).to.be.instanceOf(TText);
-                expect(obj2.children[0].children[0].children[0].text).to.be.equals("term");
-                expect(obj2.children[0].children[1]).to.be.instanceOf(TElement);
-                expect(obj2.children[0].children[1].tagName).to.be.equals("dd");
-                expect(obj2.children[0].children[1].children[0]).to.be.instanceOf(TText);
-                expect(obj2.children[0].children[1].children[0].text).to.be.equals("def1");
-                expect(obj2.children[0].children[2]).to.be.instanceOf(TElement);
-                expect(obj2.children[0].children[2].tagName).to.be.equals("dd");
-                expect(obj2.children[0].children[2].children[0]).to.be.instanceOf(TText);
-                expect(obj2.children[0].children[2].children[0].text).to.be.equals("def2");
-            });
-     */
     public function testDtElementOmmitingEndTag()
     {
         $obj1 = $this->parse("<dl><dt>term1<dt>term2<dd>def</dd></dl>");
