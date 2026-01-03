@@ -49,10 +49,17 @@ class ExpressionParser extends AbstractParser
             $char = $this->text[$this->position];
             $partCodePosition = $this->currentCodePosition();
             if (preg_match("/\s/", $char)) {
-                if($endLevel==1)
+                if ($endLevel == 1)
                     break;
                 else
-                $this->position++;
+                    $this->position++;
+            } else if ($lastNode && $char == '?' && ($this->text[$this->position + 1] ?? '') == '.') {
+                if (!$lastNode) {
+                    $this->throw("Unexpected '?.'");
+                }
+                $this->position += 2;
+                $name = $this->readUntill('/[\'"\(\)=\.:\s>+\-*?]/');
+                $lastNode = new TEProperty($lastNode, $name, true);
             } else if ($lastNode && $char == '.') {
                 if (!$lastNode) {
                     $this->throw("Unexpected '.'");

@@ -298,7 +298,7 @@ class ExpressionExecuteTest extends TestCase
         $env->allowUndefined = false;
 
         $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
-        $this->expectExceptionMessageMatches('/variable `notExisting` don\'t exists/');
+        $this->expectExceptionMessageMatches('/Undefined variable: notExisting/');
         $this->expectExceptionMessageMatches('/file.mpts:1:2/');
         $obj->execute($env);
     }
