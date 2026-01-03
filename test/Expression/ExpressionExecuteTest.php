@@ -331,6 +331,14 @@ class ExpressionExecuteTest extends TestCase
         $env->variables['a'] = (object)[];
         $this->assertNull($obj->execute($env));
     }
+    public function testNotExistingPropertyNullableOperator()
+    {
+        $obj = ExpressionParser::Parse("a?.b.c");
+        $env = new Environment();
+        $env->allowUndefined = false;
+        $env->variables['a'] = (object)[];
+        $this->assertNull($obj->execute($env));
+    }
 
     public function testBadTypeMethodCall()
     {
@@ -339,11 +347,8 @@ class ExpressionExecuteTest extends TestCase
         // set variable to non-callable to trigger method-call-on-non-method
         $env->variables['a'] = (object)[];
         $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
-        $this->expectExceptionMessageMatches('/method call|callable|Cannot/m');
-        // ensure code position is included in message (at least file.mpts token)
-        $this->expectExceptionMessageMatches('/file\.mpts|<unknown>:/');
-        // parse with a file position so position info is available
-        $obj = ExpressionParser::Parse("a.b()");
+        $this->expectExceptionMessageMatches('/method call on non method/');
+        $this->expectExceptionMessageMatches('/file\.mpts:1:2/');
         $obj->execute($env);
     }
 
@@ -353,9 +358,8 @@ class ExpressionExecuteTest extends TestCase
         $env = new Environment();
         $env->variables['a'] = (object)['b' => (object)[]];
         $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
-        $this->expectExceptionMessageMatches('/method call|callable|Cannot/m');
-        $this->expectExceptionMessageMatches('/file\.mpts|<unknown>:/');
-        $obj = ExpressionParser::Parse("a.c()");
+        $this->expectExceptionMessageMatches('/method don\'t exists/');
+        $this->expectExceptionMessageMatches('/file\.mpts:1:3/');
         $obj->execute($env);
     }
 
