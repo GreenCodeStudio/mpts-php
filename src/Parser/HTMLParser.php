@@ -33,15 +33,19 @@ class HTMLParser extends AbstractMLParser
             } else if (strtolower($parent->tagName) == 'p' && in_array(strtolower($element->tagName), $this->closingParagraphElements)) {
                 array_pop($this->openElements);
                 $parent = $this->openElements[count($this->openElements) - 1];
+            } else if (strtolower($parent->tagName) == 'option' && strtolower($element->tagName) == 'optgroup') {
+                array_pop($this->openElements);
+                $parent = $this->openElements[count($this->openElements) - 1];
             } else if ((strtolower($parent->tagName) == 'dd' || strtolower($parent->tagName) == 'dt') && (strtolower($element->tagName) == 'dd' || strtolower($element->tagName) == 'dt')) {
                 array_pop($this->openElements);
                 $parent = $this->openElements[count($this->openElements) - 1];
-            }else if ((strtolower($parent->tagName) == 'rt' || strtolower($parent->tagName) == 'rp') && (strtolower($element->tagName) == 'rt' || strtolower($element->tagName) == 'rp')) {
+            } else if ((strtolower($parent->tagName) == 'rt' || strtolower($parent->tagName) == 'rp') && (strtolower($element->tagName) == 'rt' || strtolower($element->tagName) == 'rp')) {
                 array_pop($this->openElements);
                 $parent = $this->openElements[count($this->openElements) - 1];
-            }}
-            $parent->addChild($element);
-            if (!$autoclose && !in_array(strtolower($element->tagName), $this->voidElements))
-                $this->openElements[] = $element;
+            }
         }
+        $parent->addChild($element);
+        if (!$autoclose && !in_array(strtolower($element->tagName), $this->voidElements))
+            $this->openElements[] = $element;
     }
+}
