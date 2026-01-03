@@ -291,4 +291,85 @@ class ExpressionExecuteTest extends TestCase
 
     }
 
+    public function testNotExistingVariable()
+    {
+        $obj = ExpressionParser::Parse("notExisting");
+        $env = new Environment();
+        $env->allowUndefined = false;
+
+        $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
+        $this->expectExceptionMessageMatches('/variable `notExisting` don\'t exists/');
+        $this->expectExceptionMessageMatches('/file.mpts:1:2/');
+        $obj->execute($env);
+    }
+
+    public function testNotExistingVariableAllowUndefined()
+    {
+        $obj = ExpressionParser::Parse("notExisting");
+        $env = new Environment();
+        $env->allowUndefined = true;
+        $this->assertNull($obj->execute($env));
+    }
+
+    public function testNotExistingProperty()
+    {
+        $obj = ExpressionParser::Parse("a.b.c");
+        $env = new Environment();
+        $env->allowUndefined = false;
+        $env->variables['a'] = (object)[];
+        $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
+        $this->expectExceptionMessageMatches('/property `b` don\'t exists/');
+        $this->expectExceptionMessageMatches('/file.mpts:1:2/');
+        $obj->execute($env);
+    }
+
+    public function testNotExistingPropertyAllowUndefined()
+    {
+        $obj = ExpressionParser::Parse("a.b.c");
+        $env = new Environment();
+        $env->allowUndefined = true;
+        $env->variables['a'] = (object)[];
+        $this->assertNull($obj->execute($env));
+    }
+
+    public function testBadTypeMethodCall()
+    {
+        $obj = ExpressionParser::Parse("a.b()");
+        $env = new Environment();
+        // set variable to non-callable to trigger method-call-on-non-method
+        $env->variables['a'] = (object)[];
+        $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
+        $this->expectExceptionMessageMatches('/method call|callable|Cannot/m');
+        // ensure code position is included in message (at least file.mpts token)
+        $this->expectExceptionMessageMatches('/file\.mpts|<unknown>:/');
+        // parse with a file position so position info is available
+        $obj = ExpressionParser::Parse("a.b()");
+        $obj->execute($env);
+    }
+
+    public function testNotExistingMethodCall()
+    {
+        $obj = ExpressionParser::Parse("a.c()");
+        $env = new Environment();
+        $env->variables['a'] = (object)['b' => (object)[]];
+        $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
+        $this->expectExceptionMessageMatches('/method call|callable|Cannot/m');
+        $this->expectExceptionMessageMatches('/file\.mpts|<unknown>:/');
+        $obj = ExpressionParser::Parse("a.c()");
+        $obj->execute($env);
+    }
+
+    public function testExceptionInsideMethodCall()
+    {
+        $obj = ExpressionParser::Parse("a()");
+        $env = new Environment();
+        $env->variables['a'] = function () {
+            throw new \Exception("inside method error");
+        };
+        $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
+        $this->expectExceptionMessageMatches('/inside method error/');
+        $this->expectExceptionMessageMatches('/file\.mpts:1:1/');
+        $obj->execute($env);
+    }
+
 }
