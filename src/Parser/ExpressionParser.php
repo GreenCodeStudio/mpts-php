@@ -54,18 +54,12 @@ class ExpressionParser extends AbstractParser
                 else
                     $this->position++;
             } else if ($lastNode && $char == '?' && ($this->text[$this->position + 1] ?? '') == '.') {
-                if (!$lastNode) {
-                    $this->throw("Unexpected '?.'");
-                }
                 $this->position += 2;
                 $partCodePosition = $this->currentCodePosition();
                 $name = $this->readUntill('/[\'"\(\)=\.:\s>+\-*?]/');
                 $lastNode = new TEProperty($lastNode, $name, true);
                 $lastNode->codePosition = $partCodePosition;
             } else if ($lastNode && $char == '.') {
-                if (!$lastNode) {
-                    $this->throw("Unexpected '.'");
-                }
                 $this->position++;
                 $partCodePosition = $this->currentCodePosition();
                 $name = $this->readUntill('/[\'"\(\)=\.:\s>+\-*?]/');
@@ -233,7 +227,7 @@ class ExpressionParser extends AbstractParser
                     $this->position++;
                 }
                 $right = $this->parseNormal(40);
-                $lastNode = new TEComparsion($lastNode, $right, true, $orEqual);
+                $lastNode = new TEComparsion($lastNode, $right, false, $orEqual);
 
             } else {
                 if ($lastNode) {

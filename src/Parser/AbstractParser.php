@@ -47,7 +47,11 @@ abstract class  AbstractParser
 
     protected function throw($message)
     {
-        throw new MptsParserError($message, $this->currentCodePosition(), substr($this->text, $this->position, 10));
+        throw new MptsParserError(
+            $message,
+            $this->currentCodePosition(),
+            substr($this->text, $this->position, 10)
+        );
     }
 
     public function currentLineOffset()

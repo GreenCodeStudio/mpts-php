@@ -20,23 +20,23 @@ class TEProperty extends TEExpression
     public function execute(Environment $env)
     {
         $clonedEnv = clone $env;
-        $obj = $this->source->execute($clonedEnv);
+        $parent = $this->source->execute($clonedEnv);
         if ($this->orNull || $clonedEnv->allowUndefined) {
             $env->allowUndefined = true;
         }
         $name = $this->name;
         if ($env->allowUndefined) {
-            if (is_array($obj))
-                return $obj[$name] ?? null;
+            if (is_array($parent))
+                return $parent[$name] ?? null;
             else
-                return ($obj->$name) ?? null;
+                return ($parent->$name) ?? null;
         } else {
-            if (is_array($obj))
-                return $obj[$name];
-            else if (isset($obj->$name))
-                return $obj->$name;
-            else if (is_object($obj) && method_exists($obj, $name))
-                return fn(...$args) => $obj->$name(...$args);
+            if (is_array($parent))
+                return $parent[$name];
+            else if (isset($parent->$name))
+                return $parent->$name;
+            else if (is_object($parent) && method_exists($parent, $name))
+                return fn(...$args) => $parent->$name(...$args);
             else $this->throw('Undefined property: '.$name);
         }
     }

@@ -138,7 +138,7 @@ class HTMLParserTest extends UniParserTest
         }
     }
 
-    public function tetOptgroup()
+    public function testOptgroup()
     {
         $obj = $this->parse("<select><option>1<optgroup><option>2<option>3</select>");
         $this->assertInstanceOf(TDocumentFragment::class, $obj);
