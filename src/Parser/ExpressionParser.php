@@ -58,15 +58,19 @@ class ExpressionParser extends AbstractParser
                     $this->throw("Unexpected '?.'");
                 }
                 $this->position += 2;
+                $partCodePosition = $this->currentCodePosition();
                 $name = $this->readUntill('/[\'"\(\)=\.:\s>+\-*?]/');
                 $lastNode = new TEProperty($lastNode, $name, true);
+                $lastNode->codePosition = $partCodePosition;
             } else if ($lastNode && $char == '.') {
                 if (!$lastNode) {
                     $this->throw("Unexpected '.'");
                 }
                 $this->position++;
+                $partCodePosition = $this->currentCodePosition();
                 $name = $this->readUntill('/[\'"\(\)=\.:\s>+\-*?]/');
                 $lastNode = new TEProperty($lastNode, $name);
+                $lastNode->codePosition = $partCodePosition;
             } else if (!$lastNode && preg_match("/[0-9\.]/", $char)) {
                 $this->position++;
                 $value = $char.$this->readUntill("/[^0-9\.e]/");

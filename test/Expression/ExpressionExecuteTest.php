@@ -1,5 +1,6 @@
 <?php
 
+use MKrawczyk\Mpts\CodePosition;
 use MKrawczyk\Mpts\Environment;
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
@@ -14,9 +15,14 @@ use PHPUnit\Framework\TestCase;
 
 class ExpressionExecuteTest extends TestCase
 {
+    protected function parse(string $code)
+    {
+        return ExpressionParser::Parse($code, new CodePosition("file.mpts", 1, 0, 0, 0));
+    }
+
     public function testVariable()
     {
-        $obj = ExpressionParser::Parse("var1");
+        $obj = $this->parse("var1");
 
         $env = new Environment();
         $env->variables['var1'] = new StdClass();
@@ -25,7 +31,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testBoolTrue()
     {
-        $obj = ExpressionParser::Parse("true");
+        $obj = $this->parse("true");
 
         $env = new Environment();
         $this->assertEquals(true, $obj->execute($env));
@@ -33,7 +39,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testBoolFalse()
     {
-        $obj = ExpressionParser::Parse("false");
+        $obj = $this->parse("false");
 
         $env = new Environment();
         $this->assertEquals(false, $obj->execute($env));
@@ -41,7 +47,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testProperty()
     {
-        $obj = ExpressionParser::Parse("var1.sub.sub2");
+        $obj = $this->parse("var1.sub.sub2");
 
         $env = new Environment();
         $env->variables['var1'] = (object)['sub' => ['sub2' => new StdClass()]];
@@ -50,7 +56,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testNumber()
     {
-        $obj = ExpressionParser::Parse("123");
+        $obj = $this->parse("123");
 
         $env = new Environment();
         $this->assertEquals(123, $obj->execute($env));
@@ -58,7 +64,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testNumberDecimal()
     {
-        $obj = ExpressionParser::Parse("1.23");
+        $obj = $this->parse("1.23");
 
         $env = new Environment();
         $this->assertEquals(1.23, $obj->execute($env));
@@ -66,7 +72,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testNumberE()
     {
-        $obj = ExpressionParser::Parse("1.23e2");
+        $obj = $this->parse("1.23e2");
 
         $env = new Environment();
         $this->assertEquals(1.23e2, $obj->execute($env));
@@ -74,7 +80,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testString1()
     {
-        $obj = ExpressionParser::Parse("'text'");
+        $obj = $this->parse("'text'");
 
         $env = new Environment();
         $this->assertEquals('text', $obj->execute($env));
@@ -82,7 +88,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testString2()
     {
-        $obj = ExpressionParser::Parse('"text"');
+        $obj = $this->parse('"text"');
 
         $env = new Environment();
         $this->assertEquals('text', $obj->execute($env));
@@ -90,7 +96,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testStringConcat()
     {
-        $obj = ExpressionParser::Parse('"te":\'xt\'');
+        $obj = $this->parse('"te":\'xt\'');
 
         $env = new Environment();
         $this->assertEquals('text', $obj->execute($env));
@@ -98,7 +104,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testEqual()
     {
-        $obj = ExpressionParser::Parse('a==b');
+        $obj = $this->parse('a==b');
 
         $env = new Environment();
         $env->variables['a'] = 1;
@@ -110,7 +116,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testEqualDouble()
     {
-        $obj = ExpressionParser::Parse('(a==b)==(c==d)');
+        $obj = $this->parse('(a==b)==(c==d)');
 
         $env = new Environment();
         $env->variables['a'] = 1;
@@ -122,7 +128,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testMethodCall()
     {
-        $obj = ExpressionParser::Parse('fun(x)');
+        $obj = $this->parse('fun(x)');
 
         $env = new Environment();
         $env->variables['x'] = 1;
@@ -132,7 +138,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testMethodCallMultiple()
     {
-        $obj = ExpressionParser::Parse('fun(first,second)');
+        $obj = $this->parse('fun(first,second)');
 
         $env = new Environment();
         $env->variables['first'] = 3;
@@ -143,7 +149,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testAdd()
     {
-        $obj = ExpressionParser::Parse("2+5 + 3");
+        $obj = $this->parse("2+5 + 3");
 
         $env = new Environment();
         $this->assertEquals(10, $obj->execute($env));
@@ -151,7 +157,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testSub()
     {
-        $obj = ExpressionParser::Parse("2-5 - 3");
+        $obj = $this->parse("2-5 - 3");
 
         $env = new Environment();
         $this->assertEquals(-6, $obj->execute($env));
@@ -160,7 +166,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testMultiply()
     {
-        $obj = ExpressionParser::Parse("2*5 * 3");
+        $obj = $this->parse("2*5 * 3");
 
         $env = new Environment();
         $this->assertEquals(30, $obj->execute($env));
@@ -168,14 +174,14 @@ class ExpressionExecuteTest extends TestCase
 
     public function testDivide()
     {
-        $obj = ExpressionParser::Parse("20/5 / 2");
+        $obj = $this->parse("20/5 / 2");
         $env = new Environment();
         $this->assertEquals(2, $obj->execute($env));
     }
 
     public function testPrecedence()
     {
-        $obj = ExpressionParser::Parse("2+5 * 3");
+        $obj = $this->parse("2+5 * 3");
 
         $env = new Environment();
         $this->assertEquals(17, $obj->execute($env));
@@ -183,7 +189,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testParenthesis()
     {
-        $obj = ExpressionParser::Parse("(2+5) * 3");
+        $obj = $this->parse("(2+5) * 3");
 
         $env = new Environment();
         $this->assertEquals(21, $obj->execute($env));
@@ -191,7 +197,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testModulo()
     {
-        $obj = ExpressionParser::Parse("20 % 6");
+        $obj = $this->parse("20 % 6");
 
         $env = new Environment();
         $this->assertEquals(2, $obj->execute($env));
@@ -199,7 +205,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testOrNull()
     {
-        $obj = ExpressionParser::Parse('var1??"empty"');
+        $obj = $this->parse('var1??"empty"');
 
         $env = new Environment();
         $this->assertEquals("empty", $obj->execute($env));
@@ -211,7 +217,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testOrNullProperty()
     {
-        $obj = ExpressionParser::Parse('var1.property??"empty"');
+        $obj = $this->parse('var1.property??"empty"');
 
         $env = new Environment();
         $this->assertEquals("empty", $obj->execute($env));
@@ -235,7 +241,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testAnd()
     {
-        $obj = ExpressionParser::Parse("a && b");
+        $obj = $this->parse("a && b");
         $env = new Environment();
         $env->variables['a'] = true;
         $env->variables['b'] = false;
@@ -246,7 +252,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testOr()
     {
-        $obj = ExpressionParser::Parse("a || b");
+        $obj = $this->parse("a || b");
         $env = new Environment();
         $env->variables['a'] = false;
         $env->variables['b'] = false;
@@ -257,7 +263,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testNot()
     {
-        $obj = ExpressionParser::Parse("!a");
+        $obj = $this->parse("!a");
         $env = new Environment();
         $env->variables['a'] = false;
         $this->assertEquals(true, $obj->execute($env));
@@ -269,7 +275,7 @@ class ExpressionExecuteTest extends TestCase
 
     public function testDoubleNot()
     {
-        $obj = ExpressionParser::Parse("!!a");
+        $obj = $this->parse("!!a");
         $env = new Environment();
         $env->variables['a'] = false;
         $this->assertEquals(false, $obj->execute($env));
@@ -293,19 +299,19 @@ class ExpressionExecuteTest extends TestCase
 
     public function testNotExistingVariable()
     {
-        $obj = ExpressionParser::Parse("notExisting");
+        $obj = $this->parse("notExisting");
         $env = new Environment();
         $env->allowUndefined = false;
 
         $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
         $this->expectExceptionMessageMatches('/Undefined variable: notExisting/');
-        $this->expectExceptionMessageMatches('/file.mpts:1:2/');
+        $this->expectExceptionMessageMatches('/file.mpts:1:0/');
         $obj->execute($env);
     }
 
     public function testNotExistingVariableAllowUndefined()
     {
-        $obj = ExpressionParser::Parse("notExisting");
+        $obj = $this->parse("notExisting");
         $env = new Environment();
         $env->allowUndefined = true;
         $this->assertNull($obj->execute($env));
@@ -313,27 +319,28 @@ class ExpressionExecuteTest extends TestCase
 
     public function testNotExistingProperty()
     {
-        $obj = ExpressionParser::Parse("a.b.c");
+        $obj = $this->parse("a.b.c");
         $env = new Environment();
         $env->allowUndefined = false;
         $env->variables['a'] = (object)[];
         $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
-        $this->expectExceptionMessageMatches('/property `b` don\'t exists/');
+        $this->expectExceptionMessageMatches('/Undefined property: b/');
         $this->expectExceptionMessageMatches('/file.mpts:1:2/');
         $obj->execute($env);
     }
 
     public function testNotExistingPropertyAllowUndefined()
     {
-        $obj = ExpressionParser::Parse("a.b.c");
+        $obj = $this->parse("a.b.c");
         $env = new Environment();
         $env->allowUndefined = true;
         $env->variables['a'] = (object)[];
         $this->assertNull($obj->execute($env));
     }
+
     public function testNotExistingPropertyNullableOperator()
     {
-        $obj = ExpressionParser::Parse("a?.b.c");
+        $obj = $this->parse("a?.b.c");
         $env = new Environment();
         $env->allowUndefined = false;
         $env->variables['a'] = (object)[];
@@ -342,30 +349,30 @@ class ExpressionExecuteTest extends TestCase
 
     public function testBadTypeMethodCall()
     {
-        $obj = ExpressionParser::Parse("a.b()");
+        $obj = $this->parse("a.b()");
         $env = new Environment();
         // set variable to non-callable to trigger method-call-on-non-method
         $env->variables['a'] = (object)[];
         $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
         $this->expectExceptionMessageMatches('/method call on non method/');
-        $this->expectExceptionMessageMatches('/file\.mpts:1:2/');
+        $this->expectExceptionMessageMatches('/file\\.mpts:1:3/');
         $obj->execute($env);
     }
 
     public function testNotExistingMethodCall()
     {
-        $obj = ExpressionParser::Parse("a.c()");
+        $obj = $this->parse("a.c()");
         $env = new Environment();
         $env->variables['a'] = (object)['b' => (object)[]];
         $this->expectException(\MKrawczyk\Mpts\MptsExecutionError::class);
         $this->expectExceptionMessageMatches('/method don\'t exists/');
-        $this->expectExceptionMessageMatches('/file\.mpts:1:3/');
+        $this->expectExceptionMessageMatches('/file\\.mpts:1:3/');
         $obj->execute($env);
     }
 
     public function testExceptionInsideMethodCall()
     {
-        $obj = ExpressionParser::Parse("a()");
+        $obj = $this->parse("a()");
         $env = new Environment();
         $env->variables['a'] = function () {
             throw new \Exception("inside method error");
