@@ -223,4 +223,22 @@ class ExecutionTest extends TestCase
         $env->document = new DOMDocument();
         $obj->execute($env);
     }
+
+    public function testExceptionInsideExpression()
+    {
+        $this->expectExceptionMessageMatches('/inside method error/');
+        $this->expectExceptionMessageMatches('/file\.mpts:1:5/');
+
+        $obj = XMLParser::Parse("{{a.b()}}", "file.mpts");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['a'] = new class {
+            public function b()
+            {
+                throw new \Exception("inside method error");
+            }
+        };
+
+        $obj->execute($env);
+    }
 }

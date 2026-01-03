@@ -8,7 +8,7 @@ use MKrawczyk\Mpts\MptsExecutionError;
 
 abstract class TEExpression
 {
-    public ?CodePosition $codePosition;
+    public ?CodePosition $codePosition = null;
     public abstract function execute(Environment $env);
     protected function throw(string $message)
     {

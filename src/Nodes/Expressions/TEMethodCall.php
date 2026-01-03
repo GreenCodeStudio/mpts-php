@@ -4,6 +4,7 @@ namespace MKrawczyk\Mpts\Nodes\Expressions;
 
 use MKrawczyk\Mpts\Environment;
 use MKrawczyk\FunQuery\FunQuery;
+use MKrawczyk\Mpts\MptsExecutionError;
 
 class TEMethodCall extends TEExpression
 {
@@ -19,6 +20,10 @@ class TEMethodCall extends TEExpression
     public function execute(Environment $env)
     {
         $args=FunQuery::create($this->args)->map(fn($x)=>$x->execute($env));
-        return $this->source->execute($env)(...$args);
+        try {
+            return $this->source->execute($env)(...$args);
+        } catch (\Throwable $ex) {
+            throw new MptsExecutionError($ex->getMessage(), $this->codePosition, $ex);
+        }
     }
 }

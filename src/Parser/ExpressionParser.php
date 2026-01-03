@@ -79,6 +79,7 @@ class ExpressionParser extends AbstractParser
             } else if ($char == "(") {
                 if ($lastNode) {
                     $lastNode = new TEMethodCall($lastNode);
+                    $lastNode->codePosition = $partCodePosition;
                     $this->position++;
                     $this->skipWhitespace();
                     while ($this->position < strlen($this->text) && $this->text[$this->position] != ')') {
