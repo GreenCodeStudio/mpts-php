@@ -15,6 +15,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEModulo;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMultiply;
 use MKrawczyk\Mpts\Nodes\Expressions\TENegate;
 use MKrawczyk\Mpts\Nodes\Expressions\TENotEqual;
+use MKrawczyk\Mpts\Nodes\Expressions\TENull;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOr;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
@@ -234,7 +235,9 @@ class ExpressionParser extends AbstractParser
                     break;
                 }
                 $name = $this->readUntill("/['\"\(\)=\.\s:>\/+\-*?,]/");
-                if ($name == "true") {
+                if ($name == "null") {
+                    $lastNode = new TENull();
+                } else if ($name == "true") {
                     $lastNode = new TEBoolean(true);
                 } else if ($name == "false") {
                     $lastNode = new TEBoolean(false);

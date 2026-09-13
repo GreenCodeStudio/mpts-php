@@ -8,6 +8,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
+use MKrawczyk\Mpts\Nodes\Expressions\TENull;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
@@ -95,6 +96,7 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEString::class, $obj);
         $this->assertEquals("text", $obj->value);
     }
+
     public function testString3()
     {
         $obj = ExpressionParser::Parse('"&#x63;&#100;"');
@@ -248,6 +250,23 @@ class ExpressionParseTest extends TestCase
         $this->assertEquals("a", $obj->left->name);
         $this->assertInstanceOf(TEVariable::class, $obj->right);
         $this->assertEquals("b", $obj->right->name);
+    }
+
+    public function testNotEqualsNull()
+    {
+        $obj = ExpressionParser::Parse('var1 != null');
+
+        $this->assertInstanceOf(TEEqual::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("var1", $obj->left->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->right);
+        $this->assertEquals("null", $obj->right->name);
+    }
+    public function testNull()
+    {
+        $obj = ExpressionParser::Parse('null');
+
+        $this->assertInstanceOf(TENull::class, $obj);
     }
 
 }
