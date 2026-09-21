@@ -21,7 +21,7 @@ class TEVariable extends TEExpression
         if ($env->allowUndefined) {
             return $env->variables[$this->name] ?? null;
         } else {
-            if(isset($env->variables[$this->name])===false){
+            if(!array_key_exists($this->name, $env->variables)){
                 $this->throw("Undefined variable: ".$this->name);
             }
             return $env->variables[$this->name];

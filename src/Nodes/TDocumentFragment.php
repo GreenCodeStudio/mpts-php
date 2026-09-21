@@ -14,7 +14,9 @@ class TDocumentFragment extends TNode
         foreach ($this->children as $child) {
             $result=$child->execute($env);
             if($result instanceof \DOMDocumentFragment && !$result->firstChild) continue;
-            $ret->appendChild($result);
+            if($result) {
+                $ret->appendChild($result);
+            }
         }
         return $ret;
     }
