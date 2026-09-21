@@ -30,7 +30,10 @@ class TIf extends TNode
         }
         $ret = $env->document->createDocumentFragment();
         foreach ($condition->children as $child) {
-            $ret->appendChild($child->execute($env));
+            $item=$child->execute($env);
+            if($item) {
+                $ret->appendChild($item);
+            }
         }
         return $ret;
     }
