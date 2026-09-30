@@ -37,6 +37,8 @@ class TEProperty extends TEExpression
                 return $parent->$name;
             else if (is_object($parent) && method_exists($parent, $name))
                 return fn(...$args) => $parent->$name(...$args);
+            else if(is_object($parent) && property_exists($parent, $name))
+                return $parent->$name;
             else $this->throw('Undefined property: '.$name);
         }
     }
