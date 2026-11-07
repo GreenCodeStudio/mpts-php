@@ -241,6 +241,23 @@ class ExpressionParseTest extends TestCase
         $this->assertEquals("data", $obj->args[2]->name);
     }
 
+    public function testFunctionCall3()
+    {
+        $obj = ExpressionParser::Parse('getView(object.prop1, object.prop2, \'text\')');
+
+        $this->assertInstanceOf(TEMethodCall::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->source);
+        $this->assertEquals("getView", $obj->source->name);
+        $this->assertInstanceOf(TEProperty::class, $obj->args[0]);
+        $this->assertEquals("prop1", $obj->args[0]->name);
+        $this->assertEquals("object", $obj->args[0]->source->name);
+        $this->assertInstanceOf(TEProperty::class, $obj->args[1]);
+        $this->assertEquals("prop2", $obj->args[1]->name);
+        $this->assertEquals("object", $obj->args[1]->source->name);
+        $this->assertInstanceOf(TEString::class, $obj->args[2]);
+        $this->assertEquals("text", $obj->args[2]->value);
+    }
+
     public function testAdd()
     {
         $obj = ExpressionParser::Parse('a+b');
