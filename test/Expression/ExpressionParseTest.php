@@ -2,11 +2,13 @@
 
 use MKrawczyk\Mpts\Environment;
 use MKrawczyk\Mpts\Nodes\Expressions\TEAdd;
+use MKrawczyk\Mpts\Nodes\Expressions\TEAnd;
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
+use MKrawczyk\Mpts\Nodes\Expressions\TEOr;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
 use MKrawczyk\Mpts\Nodes\Expressions\TENull;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
@@ -285,5 +287,44 @@ class ExpressionParseTest extends TestCase
 
         $this->assertInstanceOf(TENull::class, $obj);
     }
+    public function testOr()
+    {
+        $obj = ExpressionParser::Parse('var1 || var2');
 
+        $this->assertInstanceOf(TEOr::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("var1", $obj->left->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->right);
+        $this->assertEquals("var2", $obj->right->name);
+    }
+    public function testOrNoSpaces()
+    {
+        $obj = ExpressionParser::Parse('var1||var2');
+
+        $this->assertInstanceOf(TEOr::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("var1", $obj->left->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->right);
+        $this->assertEquals("var2", $obj->right->name);
+    }
+    public function testAnd()
+    {
+        $obj = ExpressionParser::Parse('var1 && var2');
+
+        $this->assertInstanceOf(TEAnd::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("var1", $obj->left->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->right);
+        $this->assertEquals("var2", $obj->right->name);
+    }
+    public function testAndNoSpaces()
+    {
+        $obj = ExpressionParser::Parse('var1&&var2');
+
+        $this->assertInstanceOf(TEAnd::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("var1", $obj->left->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->right);
+        $this->assertEquals("var2", $obj->right->name);
+    }
 }
