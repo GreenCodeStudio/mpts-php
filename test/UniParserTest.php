@@ -190,6 +190,16 @@ abstract class  UniParserTest extends TestCase
         $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[1]->children[0]);
         $this->assertInstanceOf(TText::class, $obj->children[0]->else->children[0]);
     }
+    public function testIfNoSpace()
+    {
+        $obj = $this->parse("<:if condition=a.b<c>text</:if>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TIf::class, $obj->children[0]);
+        $this->assertInstanceOf(TEComparsion::class, $obj->children[0]->conditions[0]->expression);
+        $this->assertInstanceOf(TEProperty::class, $obj->children[0]->conditions[0]->expression->left);
+        $this->assertInstanceOf(TEVariable::class, $obj->children[0]->conditions[0]->expression->right);
+        $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[0]->children[0]);
+    }
 
     public function testLoop()
     {
