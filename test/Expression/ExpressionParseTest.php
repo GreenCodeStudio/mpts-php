@@ -214,6 +214,26 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEString::class, $obj->right);
         $this->assertEquals("empty", $obj->right->value);
     }
+    public function testOrEmpty()
+    {
+        $obj = ExpressionParser::Parse('var1???"empty"');
+
+        $this->assertInstanceOf(TEOrEmpty::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("var1", $obj->left->name);
+        $this->assertInstanceOf(TEString::class, $obj->right);
+        $this->assertEquals("empty", $obj->right->value);
+    }
+    public function testOrEmptySpaces()
+    {
+        $obj = ExpressionParser::Parse('var1 ??? "empty"');
+
+        $this->assertInstanceOf(TEOrEmpty::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("var1", $obj->left->name);
+        $this->assertInstanceOf(TEString::class, $obj->right);
+        $this->assertEquals("empty", $obj->right->value);
+    }
 
     public function testOrNullProperty()
     {

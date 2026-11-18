@@ -18,6 +18,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TENotEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TENull;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOr;
+use MKrawczyk\Mpts\Nodes\Expressions\TEOrEmpty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
@@ -112,7 +113,7 @@ class ExpressionParser extends AbstractParser
                     $this->throw("( not opened");
                 }
             } else if ($char == '=') {
-                if ($this->text[$this->position + 1] != "=") {
+                if (($this->text[$this->position + 1]??'') != "=") {
                     $this->throw("Assignment '=' is not allowed in expressions");
                 }
                 if ($endLevel >= 40) {
@@ -121,25 +122,32 @@ class ExpressionParser extends AbstractParser
                 $this->position += 2;
                 $right = $this->parseNormal(40);
                 $lastNode = new TEEqual($lastNode, $right);
-            } else if ($char == '!' && $this->text[$this->position + 1] == "=") {
+            } else if ($char == '!' && ($this->text[$this->position + 1]??'') == "=") {
                 if ($endLevel >= 40) {
                     break;
                 }
                 $this->position += 2;
                 $right = $this->parseNormal(40);
                 $lastNode = new TENotEqual($lastNode, $right);
-            } else if ($char == '&' && $this->text[$this->position + 1] == "&") {
+            } else if ($char == '&' && ($this->text[$this->position + 1]??'') == "&") {
                 if ($endLevel >= 20) {
                     break;
                 }
                 $this->position += 2;
                 $right = $this->parseNormal(20);
                 $lastNode = new TEAnd($lastNode, $right);
-            } else if ($char == '|' && $this->text[$this->position + 1] == "|") {
+            } else if ($char == '|' && ($this->text[$this->position + 1]??'') == "|") {
                 $this->position += 2;
                 $right = $this->parseNormal(20);
                 $lastNode = new TEOr($lastNode, $right);
-            } else if ($char == '?' && $this->text[$this->position + 1] == "?") {
+            } else if ($char == '?' && ($this->text[$this->position + 1]??'') == "?"&& ($this->text[$this->position + 2]??'') == "?") {
+                if ($endLevel >= 20) {
+                    break;
+                }
+                $this->position += 3;
+                $right = $this->parseNormal(20);
+                $lastNode = new TEOrEmpty($lastNode, $right);
+            } else if ($char == '?' && ($this->text[$this->position + 1]??'') == "?") {
                 if ($endLevel >= 20) {
                     break;
                 }
@@ -167,7 +175,7 @@ class ExpressionParser extends AbstractParser
                 $this->position += 1;
                 $right = $this->parseNormal(70);
                 $lastNode = new TEMultiply($lastNode, $right);
-            } else if ($char == '/' && $this->text[$this->position + 1] != '>') {
+            } else if ($char == '/' && ($this->text[$this->position + 1]??'') != '>') {
                 if ($endLevel >= 70) {
                     break;
                 }

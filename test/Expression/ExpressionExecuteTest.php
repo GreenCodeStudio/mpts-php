@@ -205,12 +205,35 @@ class ExpressionExecuteTest extends TestCase
 
     public function testOrNull()
     {
-        $obj = $this->parse('var1??"empty"');
+        $obj = $this->parse('var1??"placeholder"');
 
         $env = new Environment();
-        $this->assertEquals("empty", $obj->execute($env));
+        $this->assertEquals("placeholder", $obj->execute($env));
         $env->variables['var1'] = null;
-        $this->assertEquals("empty", $obj->execute($env));
+        $this->assertEquals("placeholder", $obj->execute($env));
+        $env->variables['var1'] = '';
+        $this->assertEquals("", $obj->execute($env));
+        $env->variables['var1'] = 0;
+        $this->assertEquals(0, $obj->execute($env));
+        $env->variables['var1'] = false;
+        $this->assertEquals(false, $obj->execute($env));
+        $env->variables['var1'] = "val";
+        $this->assertEquals("val", $obj->execute($env));
+    }
+    public function testOrEmpty()
+    {
+        $obj = $this->parse('var1???"placeholder"');
+
+        $env = new Environment();
+        $this->assertEquals("placeholder", $obj->execute($env));
+        $env->variables['var1'] = null;
+        $this->assertEquals("placeholder", $obj->execute($env));
+        $env->variables['var1'] = '';
+        $this->assertEquals("placeholder", $obj->execute($env));
+        $env->variables['var1'] = 0;
+        $this->assertEquals("placeholder", $obj->execute($env));
+        $env->variables['var1'] = false;
+        $this->assertEquals("placeholder", $obj->execute($env));
         $env->variables['var1'] = "val";
         $this->assertEquals("val", $obj->execute($env));
     }

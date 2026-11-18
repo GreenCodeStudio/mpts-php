@@ -55,7 +55,7 @@ abstract class AbstractMLParser extends AbstractParser
                     $text = $this->readUntillText('?>');
                     $this->position += 2;
                     //ignore xml declaration
-                } else if ($this->text[$this->position + 1] == '/') {
+                } else if (($this->text[$this->position + 1]??'') == '/') {
                     $prevPosition = $this->position;
                     $this->position += 2;
                     $name = $this->parseElementEnd();
@@ -89,7 +89,7 @@ abstract class AbstractMLParser extends AbstractParser
                         $this->addElement($result->element, $result->autoclose);
                     }
                 }
-            } else if ($char == "{" && $this->text[$this->position + 1] == "{") {
+            } else if ($char == "{" && ($this->text[$this->position + 1]??'') == "{") {
                 $this->position += 2;
                 $result = $this->parseExpression('}}');
                 $node = new TExpressionText();
