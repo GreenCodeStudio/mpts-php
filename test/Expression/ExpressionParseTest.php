@@ -7,6 +7,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
+use MKrawczyk\Mpts\Nodes\Expressions\TENotEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOr;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
@@ -203,10 +204,32 @@ class ExpressionParseTest extends TestCase
         $this->assertInstanceOf(TEString::class, $obj->right);
         $this->assertEquals("empty", $obj->right->value);
     }
+    public function testOrNullSpaces()
+    {
+        $obj = ExpressionParser::Parse('var1 ?? "empty"');
+
+        $this->assertInstanceOf(TEOrNull::class, $obj);
+        $this->assertInstanceOf(TEVariable::class, $obj->left);
+        $this->assertEquals("var1", $obj->left->name);
+        $this->assertInstanceOf(TEString::class, $obj->right);
+        $this->assertEquals("empty", $obj->right->value);
+    }
 
     public function testOrNullProperty()
     {
         $obj = ExpressionParser::Parse('var1.property??"empty"');
+
+        $this->assertInstanceOf(TEOrNull::class, $obj);
+        $this->assertInstanceOf(TEProperty::class, $obj->left);
+        $this->assertEquals("property", $obj->left->name);
+        $this->assertInstanceOf(TEVariable::class, $obj->left->source);
+        $this->assertEquals("var1", $obj->left->source->name);
+        $this->assertInstanceOf(TEString::class, $obj->right);
+        $this->assertEquals("empty", $obj->right->value);
+    }
+    public function testOrNullPropertySpaces()
+    {
+        $obj = ExpressionParser::Parse('var1.property ?? "empty"');
 
         $this->assertInstanceOf(TEOrNull::class, $obj);
         $this->assertInstanceOf(TEProperty::class, $obj->left);
@@ -275,11 +298,10 @@ class ExpressionParseTest extends TestCase
     {
         $obj = ExpressionParser::Parse('var1 != null');
 
-        $this->assertInstanceOf(TEEqual::class, $obj);
+        $this->assertInstanceOf(TENotEqual::class, $obj);
         $this->assertInstanceOf(TEVariable::class, $obj->left);
         $this->assertEquals("var1", $obj->left->name);
-        $this->assertInstanceOf(TEVariable::class, $obj->right);
-        $this->assertEquals("null", $obj->right->name);
+        $this->assertInstanceOf(TENull::class, $obj->right);
     }
     public function testNull()
     {

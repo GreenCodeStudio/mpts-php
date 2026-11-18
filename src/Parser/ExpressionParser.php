@@ -40,7 +40,7 @@ class ExpressionParser extends AbstractParser
 
     public static function Parse(string $text, ?CodePosition $codePosition = null)
     {
-        return (new ExpressionParser($text, $codePosition?->fileName, $codePosition?->fileOffset, $codePosition?->lineNumber, $codePosition?->columnNumber))->parseNormal();
+        return (new  ExpressionParser($text, $codePosition?->fileName, $codePosition?->fileOffset, $codePosition?->lineNumber, $codePosition?->columnNumber))->parseNormal();
     }
 
     public function parseNormal($endLevel = 0)
@@ -57,13 +57,13 @@ class ExpressionParser extends AbstractParser
             } else if ($lastNode && $char == '?' && ($this->text[$this->position + 1] ?? '') == '.') {
                 $this->position += 2;
                 $partCodePosition = $this->currentCodePosition();
-                $name = $this->readUntill('/[\'"\(\)=\.:\s>+\-*?]/');
+                $name = $this->readUntill('/[\'"\(\)=\.:\s>+\-*?,|&]/');
                 $lastNode = new TEProperty($lastNode, $name, true);
                 $lastNode->codePosition = $partCodePosition;
             } else if ($lastNode && $char == '.') {
                 $this->position++;
                 $partCodePosition = $this->currentCodePosition();
-                $name = $this->readUntill('/[\'"\(\)=\.:\s>+\-*?]/');
+                $name = $this->readUntill('/[\'"\(\)=\.:\s>+\-*?,|&]/');
                 $lastNode = new TEProperty($lastNode, $name);
                 $lastNode->codePosition = $partCodePosition;
             } else if (!$lastNode && preg_match("/[0-9\.]/", $char)) {
@@ -234,7 +234,7 @@ class ExpressionParser extends AbstractParser
                 if ($lastNode) {
                     break;
                 }
-                $name = $this->readUntill("/['\"\(\)=\.\s:>\/+\-*?,]/");
+                $name = $this->readUntill("/['\"\(\)=\.\s:>\/+\-*?,&|]/");
                 if ($name == "null") {
                     $lastNode = new TENull();
                 } else if ($name == "true") {
