@@ -112,7 +112,7 @@ class ExecutionTest extends TestCase
         $this->assertEquals('c', $this->fragmentToHtml($result1));
     }
 
-    public function testIRealExample()
+    public function testRealExample()
     {
         $obj = XMLParser::Parse('<:if condition=canAdd><a class="button" href="/PalletMovement/add"><span class="icon-add"></span>Dodaj</a></:if>');
         $env = new Environment();
@@ -214,7 +214,7 @@ class ExecutionTest extends TestCase
         $this->assertEmpty($result->childNodes[0]->childNodes);
     }
 
-    public function testNonExistingVariable()
+    public function testNotExistingVariable()
     {
         $this->expectExceptionMessageMatches('/Undefined variable: abc/');
         $this->expectExceptionMessageMatches('/file\.mpts:1:2/');
@@ -240,5 +240,36 @@ class ExecutionTest extends TestCase
         };
 
         $obj->execute($env);
+    }
+
+    public function testNotExistingProperty()
+    {
+        $this->expectExceptionMessageMatches('/Undefined property: b/');
+        $this->expectExceptionMessageMatches('/file\.mpts:1:4/');
+        $obj = XMLParser::Parse("{{a.b}}", "file.mpts");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['a'] = (object)[];
+        $obj->execute($env);
+    }
+
+    public function testNotExistingPropertyWithNullCoalescing()
+    {
+        $obj = XMLParser::Parse("{{a.b??'default'}}", "file.mpts");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['a'] = (object)[];
+        $result = $obj->execute($env);
+        $this->assertEquals("default", $result->textContent);
+    }
+
+    public function testNotExistingPropertyNullableOperator()
+    {
+        $obj = XMLParser::Parse("{{a?.b}}", "file.mpts");
+        $env = new Environment();
+        $env->document = new DOMDocument();
+        $env->variables['a'] = (object)[];
+        $result = $obj->execute($env);
+        $this->assertEquals("", $result->textContent);
     }
 }
