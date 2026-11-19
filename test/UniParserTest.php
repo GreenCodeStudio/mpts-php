@@ -2,6 +2,7 @@
 
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEComparsion;
+use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
@@ -198,6 +199,17 @@ abstract class  UniParserTest extends TestCase
         $this->assertInstanceOf(TEComparsion::class, $obj->children[0]->conditions[0]->expression);
         $this->assertInstanceOf(TEProperty::class, $obj->children[0]->conditions[0]->expression->left);
         $this->assertInstanceOf(TEVariable::class, $obj->children[0]->conditions[0]->expression->right);
+        $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[0]->children[0]);
+    }
+
+    public function testIfShort()
+    {
+        $obj = $this->parse("<:if var1==123>text</:if>");
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TIf::class, $obj->children[0]);
+        $this->assertInstanceOf(TEEqual::class, $obj->children[0]->conditions[0]->expression);
+        $this->assertInstanceOf(TEVariable::class, $obj->children[0]->conditions[0]->expression->left);
+        $this->assertInstanceOf(TENumber::class, $obj->children[0]->conditions[0]->expression->right);
         $this->assertInstanceOf(TText::class, $obj->children[0]->conditions[0]->children[0]);
     }
 

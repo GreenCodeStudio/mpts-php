@@ -10,6 +10,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENotEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOr;
+use MKrawczyk\Mpts\Nodes\Expressions\TEOrEmpty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
 use MKrawczyk\Mpts\Nodes\Expressions\TENull;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;

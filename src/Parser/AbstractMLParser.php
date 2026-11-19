@@ -140,7 +140,20 @@ abstract class AbstractMLParser extends AbstractParser
                     $autoclose = true;
                 } else if (preg_match("/\s/", $char)) {
                     $this->position++;
-                } else {
+                }else if($element->tagName ==':if' && strtolower(substr($this->text, $this->position, 9)) != 'condition') {
+                    if ($this->text[$this->position] == '(') {
+                        $this->position++;
+                        $parser = (new ExpressionParser(substr($this->text, $this->position), $this->fileName, $this->currentFilePosition(), $this->currentLineOffset(), $this->currentColumnOffset()));
+                        $value = $parser->parseNormal(10);
+                        $this->position += $parser->position;
+                    } else {
+                        $parser = (new ExpressionParser(substr($this->text, $this->position), $this->fileName, $this->currentFilePosition(), $this->currentLineOffset(), $this->currentColumnOffset()));
+                        $value = $parser->parseNormal(1);
+                        $this->position += $parser->position;
+                    }
+                    $element->attributes[] = new TAttribute('condition', $value);
+                }
+                else {
                     $name = $this->readUntill("/[\s=\/]/");
                     $value = null;
                     $this->skipWhitespace();
