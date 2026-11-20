@@ -113,10 +113,10 @@ abstract class AbstractMLParser extends AbstractParser
 
     protected function parseElement()
     {
-        if (substr($this->text, $this->position, 8) == '!DOCTYPE') {
+        if (substr($this->text, $this->position, 9) == '!DOCTYPE ') {
             $autoclose = true;
             $element = new TDocumentType();
-            $this->position += 8;
+            $this->position += 9;
             $element->content = trim($this->readUntill("/>/"));
             $this->position++;
         } else {

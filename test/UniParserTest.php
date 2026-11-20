@@ -6,6 +6,7 @@ use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
+use MKrawczyk\Mpts\Nodes\Expressions\TEOrNull;
 use MKrawczyk\Mpts\Nodes\Expressions\TEProperty;
 use MKrawczyk\Mpts\Nodes\Expressions\TEString;
 use MKrawczyk\Mpts\Nodes\Expressions\TEVariable;
@@ -374,7 +375,7 @@ abstract class  UniParserTest extends TestCase
         $this->assertEquals("span", $obj->children[1]->tagName);
     }
 
-    public function testRealLife1()
+    public function testRealLife2()
     {
         $obj = $this->parse('<input type="text" value=(article.documentNumber??"")
                name=("articles[":article.article_id:"][":article.innerNeed_id:"][documentNumber]") />');
@@ -386,7 +387,7 @@ abstract class  UniParserTest extends TestCase
         $this->assertInstanceOf(TEString::class, $obj->children[0]->attributes[0]->expression);
 
         $this->assertEquals("value", $obj->children[0]->attributes[1]->name);
-        $this->assertInstanceOf(TEConcatenate::class, $obj->children[0]->attributes[1]->expression);
+        $this->assertInstanceOf(TEOrNull::class, $obj->children[0]->attributes[1]->expression);
 
         $this->assertEquals("name", $obj->children[0]->attributes[2]->name);
         $this->assertInstanceOf(TEConcatenate::class, $obj->children[0]->attributes[2]->expression);
