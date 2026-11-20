@@ -2,6 +2,7 @@
 
 use MKrawczyk\Mpts\Nodes\Expressions\TEBoolean;
 use MKrawczyk\Mpts\Nodes\Expressions\TEComparsion;
+use MKrawczyk\Mpts\Nodes\Expressions\TEConcatenate;
 use MKrawczyk\Mpts\Nodes\Expressions\TEEqual;
 use MKrawczyk\Mpts\Nodes\Expressions\TEMethodCall;
 use MKrawczyk\Mpts\Nodes\Expressions\TENumber;
@@ -371,5 +372,23 @@ abstract class  UniParserTest extends TestCase
         $this->assertEquals("span", $obj->children[0]->tagName);
         $this->assertInstanceOf(TElement::class, $obj->children[1]);
         $this->assertEquals("span", $obj->children[1]->tagName);
+    }
+
+    public function testRealLife1()
+    {
+        $obj = $this->parse('<input type="text" value=(article.documentNumber??"")
+               name=("articles[":article.article_id:"][":article.innerNeed_id:"][documentNumber]") />');
+        $this->assertInstanceOf(TDocumentFragment::class, $obj);
+        $this->assertInstanceOf(TElement::class, $obj->children[0]);
+        $this->assertEquals("input", $obj->children[0]->tagName);
+        $this->assertInstanceOf(TAttribute::class, $obj->children[0]->attributes[0]);
+        $this->assertEquals("type", $obj->children[0]->attributes[0]->name);
+        $this->assertInstanceOf(TEString::class, $obj->children[0]->attributes[0]->expression);
+
+        $this->assertEquals("value", $obj->children[0]->attributes[1]->name);
+        $this->assertInstanceOf(TEConcatenate::class, $obj->children[0]->attributes[1]->expression);
+
+        $this->assertEquals("name", $obj->children[0]->attributes[2]->name);
+        $this->assertInstanceOf(TEConcatenate::class, $obj->children[0]->attributes[2]->expression);
     }
 }
